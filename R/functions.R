@@ -38,7 +38,7 @@ divideTrainTest <- function(seed = NULL, prop.train = 0.7, data) {
 #' dfs <- divideTrainTest(seed = 3030, prop.train = 0.67, data = iris)
 #' irisTrain <- dfs$train
 #' irisTest <- dfs$test
-#' tr.mod <- tree(Species ~ ., data = iris)
+#' tr.mod <- tree(Species ~ ., data = irisTrain)
 #' summary(tr.mod)
 #' tryTree(mod = tr.mod, testSet = irisTest, truth = irisTest$Species)
 #' @export
