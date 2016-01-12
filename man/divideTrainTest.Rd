@@ -11,12 +11,12 @@ divideTrainTest(seed = NULL, prop.train = 0.7, data)
 
 \item{prop.train}{Proportion of the data to include in the training set.}
 
-\item{data}{The data frame to be split}
+\item{data}{The data frame to be split.}
 }
 \value{
 A list with elements named \code{test} and \code{train}.
 }
 \description{
-Divide a data frame into triaing and test sets.
+Divide a data frame into training and test sets.
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{tryTree}
 \alias{tryTree}
-\title{Predcit with a Tree}
+\title{Predict with a Tree}
 \usage{
 tryTree(mod, testSet, truth, printOut = TRUE)
 }
@@ -24,7 +24,7 @@ elements named \code{mse} and \code{rmse} (mean-square error and root mean squar
 error).
 }
 \description{
-Predcit with a Tree
+Predict with a Tree
 }
 \examples{
 dfs <- divideTrainTest(seed = 3030, prop.train = 0.67, data = iris)
