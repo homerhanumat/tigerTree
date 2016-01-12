@@ -1,10 +1,10 @@
 #' Train-Test Splitting
 #'
-#' Divide a data frame into triaing and test sets.
+#' Divide a data frame into training and test sets.
 #'
 #' @param seed A seed for randomization (recommended).
 #' @param prop.train Proportion of the data to include in the training set.
-#' @param data The data frame to be split
+#' @param data The data frame to be split.
 #'
 #' @return A list with elements named \code{test} and \code{train}.
 #' @export
@@ -21,7 +21,7 @@ divideTrainTest <- function(seed = NULL, prop.train = 0.7, data) {
 
 
 
-#' Predcit with a Tree
+#' Predict with a Tree
 #'
 #' @param mod A tree model constructed by package \code{tree}.
 #' @param testSet The test set (a data frame).
