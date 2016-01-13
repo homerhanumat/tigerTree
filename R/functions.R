@@ -67,3 +67,69 @@ tryTree <- function(mod, testSet, truth, printOut = TRUE) {
     return(invisible(results))
   }
 }
+
+
+#' Tree-Detective
+#'
+#' Yes-No questions guide the user through a classification or regression
+#' tree.
+#'
+#' @param mod A tree model constructed by the \code{tree} package.
+#' @param data Data frame used to construct the model.
+#' @param rowname Character indicating the initial row name in \code{mod$frame}.
+#' Set to "1" by default.
+#'
+#' @return Side-effects to console.
+#' @export
+#' @examples
+#' \dontrun{
+#' tr.mod <- tree(Species ~ ., data = iris)
+#' treeDetective(tr.mod, iris)
+#' }
+treeDetective <- function(mod, data, rowname = "1") {
+  df <- mod$frame
+  yprobs <- df$yprob
+  rownames(yprobs) <- row.names(df)
+  currentRow <- df[rowname, ]
+  status <- currentRow$var
+  if (status == "<leaf>") {
+    cat(paste0("I have reached a leaf with ", df[rowname,"n"]," items.\n"))
+    msg <- paste0("I predict the value is ", currentRow$yval,".\n")
+    cat(msg)
+    if (is.factor(currentRow$yval)) {
+      msg2 <- paste0("The estimated probabilities for each class are:\n")
+      cat(msg2)
+      print(yprobs[rowname,], row.names = FALSE)
+      return(invisible())
+    }
+  } else {
+    varName <- as.character(currentRow$var)
+    var <- get(varName, envir = as.environment(data))
+    isFactor <- is.factor(var)
+    charStr <- currentRow$splits[,1]
+    answer <- ifelse(isFactor,
+                     readline(prompt = factorQuestion(charStr, varName, data)),
+                     readline(prompt = numericQuestion(charStr, varName)))
+    answer <- substr(answer, 1,1)
+    rn <- as.numeric(rowname)
+    newRowName <- ifelse(answer %in% c("y","Y"), 2*rn, 2*rn + 1)
+    treeDetective(mod, data, as.character(newRowName))
+  }
+}
+
+factorQuestion <- function(charStr, varName, data) {
+  # strip leading :
+  charStr <- substr(charStr, 2, nchar(charStr))
+  chars <- strsplit(charStr, split = "")
+  levelNumbers <- sapply(chars[[1]], function(x) which(letters == x))
+  var <- get(varName, envir = as.environment(data))
+  varLevels <- levels(var)[levelNumbers]
+  joinedLevels <- paste0(varLevels, collapse = ", ")
+  return(paste0("Is ", varName, " one of: ", joinedLevels," (y/n)? "))
+}
+
+numericQuestion <- function(charStr, varName) {
+  # strip leading <
+  charStr <- substr(charStr, 2, nchar(charStr))
+  return(paste0("Is ", varName, " < ", charStr," (y/n)? "))
+}

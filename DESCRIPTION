@@ -1,7 +1,7 @@
 Package: tigerTree
 Type: Package
 Title: Functions for Working with Trees in MAT 111
-Version: 0.1
+Version: 0.1.1
 Date: 2016-01-12
 Author: Homer White <hwhite0@georgetowncollege.edu>
 Maintainer: Homer White <hwhite0@georgetowncollege.edu>
@@ -11,4 +11,4 @@ Depends:
     tree
 LazyLoad: yes
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 5.0.0
