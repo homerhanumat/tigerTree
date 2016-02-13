@@ -1,15 +1,50 @@
 #' Train-Test Splitting
 #'
-#' Divide a data frame into training and test sets.
+#' Divide a data frame into training and test set, or training, quiz and test set.
 #'
 #' @param seed A seed for randomization (recommended).
 #' @param prop.train Proportion of the data to include in the training set.
+#' @param prop.quiz Proportion of the data to include in a quiz set (if any).
+#' Set to \code{NULL} by default.
 #' @param data The data frame to be split.
 #'
-#' @return A list with elements named \code{test} and \code{train}.
+#' @return A list with elements named \code{test} and \code{train}, or with
+#' elements named \code{train} and \code{quiz} and \code{test}.
 #' @export
-divideTrainTest <- function(seed = NULL, prop.train = 0.7, data) {
+divideTrainTest <- function(seed = NULL, prop.train = 0.6,
+                            prop.quiz = NULL, data) {
+
+  # process seed option
   if (!is.null(seed)) set.seed(seed)
+
+  if (prop.train >= 1) stop("Proportion in training set must be a number less than 1.")
+
+  if (is.null(prop.quiz)) {
+    n <- nrow(data)
+    m <- floor(prop.train*n)
+    bools <- c(rep(TRUE, m), rep(FALSE, n-m))
+    inTrain <- sample(bools, size = n, replace = FALSE)
+    results <- split(data, f = inTrain)
+    names(results) <- c("test","train")
+    return(results)
+  }
+
+  if (!is.null(prop.quiz)) {
+    checksum <- prop.train + prop.quiz
+    if (checksum >= 1) stop("Training and quiz proportions must sum to less than 1.")
+    n <- nrow(data)
+    m1 <- floor(prop.train*n)
+    m2 <- floor(prop.quiz*n)
+    m3 <- n - m1 - m2
+    types <- c(rep(0, m1), rep(1,m2), rep(2, m3))
+    types <- sample(types, size = n, replace = FALSE)
+    results <- split(data, f = types)
+    names(results) <- c("train", "quiz", "test")
+    return(results)
+  }
+
+
+
   n <- nrow(data)
   m <- floor(prop.train*n)
   bools <- c(rep(TRUE, m), rep(FALSE, n-m))

@@ -4,19 +4,23 @@
 \alias{divideTrainTest}
 \title{Train-Test Splitting}
 \usage{
-divideTrainTest(seed = NULL, prop.train = 0.7, data)
+divideTrainTest(seed = NULL, prop.train = 0.6, prop.quiz = NULL, data)
 }
 \arguments{
 \item{seed}{A seed for randomization (recommended).}
 
 \item{prop.train}{Proportion of the data to include in the training set.}
 
+\item{prop.quiz}{Proportion of the data to include in a quiz set (if any).
+Set to \code{NULL} by default.}
+
 \item{data}{The data frame to be split.}
 }
 \value{
-A list with elements named \code{test} and \code{train}.
+A list with elements named \code{test} and \code{train}, or with
+elements named \code{train} and \code{quiz} and \code{test}.
 }
 \description{
-Divide a data frame into training and test sets.
+Divide a data frame into training and test set, or training, quiz and test set.
 }
 
