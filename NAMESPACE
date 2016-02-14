@@ -3,4 +3,7 @@
 export(divideTrainTest)
 export(treeDetective)
 export(tryTree)
+export(tuneTree)
+import(ggplot2)
+import(shiny)
 import(tree)

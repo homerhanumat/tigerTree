@@ -1,14 +1,17 @@
 Package: tigerTree
 Type: Package
 Title: Functions for Working with Trees in MAT 111
-Version: 0.1.1
-Date: 2016-01-12
+Version: 0.2.0
+Date: 2016-02-13
 Author: Homer White <hwhite0@georgetowncollege.edu>
 Maintainer: Homer White <hwhite0@georgetowncollege.edu>
 Description: For use by my elementary statistics students.
 License: GPL (>=3)
 Depends:
     tree
+Imports:
+    ggplot2,
+    shiny
 LazyLoad: yes
 LazyData: true
 RoxygenNote: 5.0.0

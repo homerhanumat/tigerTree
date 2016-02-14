@@ -4,5 +4,5 @@
 #'
 #' @name tigerTree
 #' @docType package
-#' @import tree
+#' @import tree shiny ggplot2
 NULL
