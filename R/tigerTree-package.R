@@ -9,5 +9,6 @@
 #' @importFrom shiny titlePanel actionButton mainPanel tabsetPanel tabPanel
 #' @importFrom shiny plotOutput verbatimTextOutput uiOutput h4 reactiveValues
 #' @importFrom shiny observeEvent renderPlot renderPrint renderUI req validate
-#' @importFrom shiny checkboxInput reactive need shinyApp
+#' @importFrom shiny checkboxInput reactive need shinyApp HTML renderTable
+#' @importFrom shiny htmlOutput tableOutput
 NULL

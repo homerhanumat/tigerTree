@@ -15,4 +15,4 @@ Imports:
     DT
 LazyLoad: yes
 LazyData: true
-RoxygenNote: 5.0.0
+RoxygenNote: 5.0.1
