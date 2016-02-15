@@ -4,5 +4,10 @@
 #'
 #' @name tigerTree
 #' @docType package
-#' @import tree shiny ggplot2
+#' @import tree DT ggplot2
+#' @importFrom shiny shinyUI fluidPage sidebarLayout sidebarPanel numericInput
+#' @importFrom shiny titlePanel actionButton mainPanel tabsetPanel tabPanel
+#' @importFrom shiny plotOutput verbatimTextOutput uiOutput h4 reactiveValues
+#' @importFrom shiny observeEvent renderPlot renderPrint renderUI req validate
+#' @importFrom shiny checkboxInput reactive need shinyApp
 NULL
