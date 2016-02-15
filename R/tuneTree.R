@@ -12,6 +12,9 @@ tuneTree <- function(formula, data, testSet, truth) {
   # for tree control:
   nobs <- nrow(data)
 
+  # useful for outputting code
+  dfName <- deparse(substitute(data))
+
   # determine tree type
   mod <- tree(formula, data)
   type <- summary(mod)$type
@@ -26,7 +29,7 @@ tuneTree <- function(formula, data, testSet, truth) {
     titlePanel("Tune Your Tree"),
 
     sidebarLayout(
-      sidebarPanel(
+      sidebarPanel(width = 3,
         numericInput(inputId = "mincut", label = "mincut",
                      value = 5, step = 1, min = 1, max = floor(nobs/2))
         ,
@@ -39,7 +42,7 @@ tuneTree <- function(formula, data, testSet, truth) {
         actionButton(inputId = "make", "Make Tree")
       )
       ,
-      mainPanel(
+      mainPanel(width = 9,
         tabsetPanel(
           tabPanel(
             title = "Tree Plot",
@@ -58,6 +61,14 @@ tuneTree <- function(formula, data, testSet, truth) {
             uiOutput("smooth"),
             h4("The most recent tree is in red")
           )
+          ,
+          tabPanel(
+            title = "Models/Code",
+            h4("Code for Selected Model(s)"),
+            verbatimTextOutput("code"),
+            h4("Models So Far (Select for Code)"),
+            DT::dataTableOutput("models")
+          )
         )
       )
     )
@@ -71,19 +82,9 @@ tuneTree <- function(formula, data, testSet, truth) {
       xy = NULL,
       currentModel = NULL,
       currentPoint = NULL,
-      try = NULL
+      try = NULL,
+      record = NULL
     )
-
-    # observeEvent(input$mincut,{
-    #   updateNumericInput(session, inputId = "minsize", min = 2*input$mincut,
-    #                      value = max(input$minsize, 2*input$mincut))
-    # })
-    #
-    # observeEvent(input$minsize,{
-    #   updateNumericInput(session, inputId = "mincut", min = 1,
-    #                      value = min(floor(input$minsize/2), input$mincut),
-    #                      max = floor(input$minsize/2))
-    # })
 
     observeEvent(input$make, {
       req(input$make && 2*input$mincut <= input$minsize)
@@ -106,6 +107,14 @@ tuneTree <- function(formula, data, testSet, truth) {
       rv$currentPoint <- data.frame(x = nodes, y = perf)
       newFrame <- rbind(rv$xy, df)
       rv$xy <- newFrame[!duplicated(newFrame),]
+      newRecord <- data.frame(
+        mincut = input$mincut,
+        minsize = input$minsize,
+        mindev = input$mindev,
+        nodes = nodes,
+        perf = perf
+      )
+      rv$record <- rbind(rv$record, newRecord)
     })
 
     output$treeplot <- renderPlot({
@@ -175,6 +184,25 @@ tuneTree <- function(formula, data, testSet, truth) {
 
     output$graph <- renderPlot({
         perfGraph()
+    })
+
+    output$models <- DT::renderDataTable({
+      req(rv$record)
+      rv$record
+    }, server = TRUE)
+
+    output$code <- renderPrint({
+      req(input$models_rows_selected)
+      rec <- input$models_rows_selected
+      selected <- rv$record[rec,]
+      code <- paste0("tr.model <- tree(", as.character(deparse(formula)),
+                     ", data = ", dfName,
+                     ",\n\t\tcontrol = tree.control(\n",
+                     "\t\t\tnobs = nrow(", dfName,"), ",
+                     "mincut = ",selected$mincut,",\n",
+                     "\t\t\tminsize = ", selected$minsize, ", ",
+                     "mindev = ", selected$mindev, "))\n")
+      cat(code)
     })
 
   }
