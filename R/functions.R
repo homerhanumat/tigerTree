@@ -83,8 +83,11 @@ tryTree <- function(mod, testSet, truth, printOut = TRUE) {
     prediction <- predict(mod, newdata = testSet, type = "class")
     wrong <- prediction!= truth
     error.rate <- mean(wrong)
+    numberWrong <- sum(wrong)
+    testSize <- nrow(testSet)
     tab <- xtabs(~prediction + truth)
     if (printOut) {
+      cat(paste0("Errors:  ", numberWrong,".  Quiz/Test Set Size:  ", testSize, ".\n"))
       cat(paste0("Error Rate is ", round(error.rate,4),".\n"))
       cat("Confusion matrix:\n")
       print(tab)

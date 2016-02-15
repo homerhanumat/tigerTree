@@ -52,7 +52,10 @@ tuneTree <- function(formula, data, testSet, truth) {
           tabPanel(
             title = "Summary/Try",
             verbatimTextOutput("summary"),
-            verbatimTextOutput("try")
+            HTML("<br>"),
+            htmlOutput("performance"),
+            tableOutput("confusion")
+            #verbatimTextOutput("try")
           )
           ,
           tabPanel(
@@ -107,13 +110,24 @@ tuneTree <- function(formula, data, testSet, truth) {
       rv$currentPoint <- data.frame(x = nodes, y = perf)
       newFrame <- rbind(rv$xy, df)
       rv$xy <- newFrame[!duplicated(newFrame),]
-      newRecord <- data.frame(
-        mincut = input$mincut,
-        minsize = input$minsize,
-        mindev = input$mindev,
-        nodes = nodes,
-        perf = perf
-      )
+
+      if ( type == "Class" ) {
+        newRecord <- data.frame(
+          mincut = input$mincut,
+          minsize = input$minsize,
+          mindev = input$mindev,
+          nodes = nodes,
+          errRate = perf
+        )
+      } else {
+        newRecord <- data.frame(
+          mincut = input$mincut,
+          minsize = input$minsize,
+          mindev = input$mindev,
+          nodes = nodes,
+          rmse = perf
+        )
+      }
       rv$record <- rbind(rv$record, newRecord)
     })
 
@@ -141,6 +155,24 @@ tuneTree <- function(formula, data, testSet, truth) {
     output$try <- renderPrint({
       req(rv$try)
       rv$try
+    })
+
+    output$performance <- renderUI({
+      req(rv$try)
+      if (type == "Class") {
+        message <- paste0("<p>On quiz set, error rate is:  ", round(rv$try$error.rate,4),
+                          ".  Confusion matrix is:<p>")
+        HTML(message)
+      } else {
+        message <- paste0("<p>On quiz set, root mean square error is:  ", round(rv$try$rmse,3),
+                          ".<p>")
+        HTML(message)
+      }
+    })
+
+    output$confusion <- renderTable({
+      req(!is.null(rv$try) && type == "Class")
+      rv$try$confusion
     })
 
     output$smooth <- renderUI({
