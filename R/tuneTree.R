@@ -242,3 +242,5 @@ tuneTree <- function(formula, data, testSet, truth) {
   ## Make App ---------
   shinyApp(ui = ui, server = server)
 }
+
+if(getRversion() >= "2.15.1") utils::globalVariables(c("y","x"))
