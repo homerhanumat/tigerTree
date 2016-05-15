@@ -11,4 +11,6 @@
 #' @importFrom shiny observeEvent renderPlot renderPrint renderUI req validate
 #' @importFrom shiny checkboxInput reactive need shinyApp HTML renderTable
 #' @importFrom shiny htmlOutput tableOutput
+#' @importFrom graphics plot text
+#' @importFrom stats predict xtabs
 NULL
