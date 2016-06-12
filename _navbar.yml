@@ -11,7 +11,7 @@ left:
     menu:
       - text:  "Train/Quiz/Test Division"
         href:  divideTrainTest.html
-      - text:  "Tryin Out Your Tree"
+      - text:  "Trying Out Your Tree"
         href:  tryTree.html
       - text:  "The Tree Detective"
         href: treeDetective.html
