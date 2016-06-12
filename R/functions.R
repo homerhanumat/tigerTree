@@ -127,7 +127,9 @@ tryTree <- function(mod, testSet, truth, printOut = TRUE) {
 treeDetective <- function(mod, data, rowname = "1") {
   df <- mod$frame
   yprobs <- df$yprob
-  rownames(yprobs) <- row.names(df)
+  if ( !is.null(yprobs) ) {
+    rownames(yprobs) <- row.names(df)
+  }
   currentRow <- df[rowname, ]
   status <- currentRow$var
   if (status == "<leaf>") {
