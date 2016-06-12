@@ -16,7 +16,7 @@ library(tigerTree)
 
 ## Setup
 
-Consider the `m111survey` data frame from the `tigerstats` package, and say that we constuct a tree to predict the sex of a perosn from the other variables in this data frame:
+Consider the `m111survey` data frame from the `tigerstats` package, and say that we constuct a tree to predict the sex of a person from the other variables in this data frame:
 
 ```{r}
 str(m111survey)
