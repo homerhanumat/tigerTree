@@ -16,7 +16,7 @@ library(tigerTree)
 
 ## Setup
 
-Consider the `m111survey` data frame from the `tigerstats` package, and say that we constuct a tree to predict the sex of a person from the other variables in this data frame:
+Consider the `m111survey` data frame from the `tigerstats` package, and say that we construct a tree to predict the sex of a person from the other variables in this data frame:
 
 ```{r}
 str(m111survey)
@@ -35,7 +35,7 @@ treeDetective(trMod, data = s2)
 
 The first argument is the model we made; the `data` argument should be set to the data frame we used to make this model.
 
-Now suppose we want to learn what the mode predicts for a person a person whose ideal height is 69 inches and whose GPA is 3.1.  As you can see from the plto above, since the ideal height is less than 71 inches we move from the root node to the left.  We then come to a node where GPA is the deciding variable.  Since the GPA is less than 2.785 we move to the left again, arriving at temrinal node where the majority of observations are females.
+Now suppose we want to learn what the mode predicts for a person a person whose ideal height is 69 inches and whose GPA is 3.1.  As you can see from the plot above, since the ideal height is less than 71 inches we move from the root node to the left.  We then come to a node where GPA is the deciding variable.  Since the GPA is less than 2.785 we move to the left again, arriving at terminal node where the majority of observations are females.
 
 The tree-detective takes the same trip through tree, interactively:
 
@@ -51,7 +51,7 @@ The estimated probabilities for each class are:
      1      0 
 ```
 
-Apparently four of the six individuals at the temrinal node are female and two are male, hence the prediction that this person is female.
+Apparently four of the six individuals at the terminal node are female and two are male, hence the prediction that this person is female.
 
 ## Regression-Tree Detective
 
