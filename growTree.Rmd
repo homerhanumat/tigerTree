@@ -1,0 +1,232 @@
+---
+title: "Growing Trees"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 4
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(tidy=FALSE, cache = TRUE)
+library(tigerstats)
+library(tigerTree)
+```
+
+## The `tree()` Function:  Basic Use
+
+We'll work with the `m111survey` data frame from the `tigerstats` package:
+
+```{r eval = FALSE}
+help(m111survey)
+str(m111survey)
+```
+
+```{r echo = F}
+str(m111survey)
+```
+
+### Preparing the Data
+
+`tree()` likes to work factor or numerical variables (or both), and it complains when there is missing data.  If you've got `NA` values in your data, consider removing them all:
+
+```{r}
+s2 <- subset(m111survey, complete.cases(m111survey) == T)
+nrow(s2)  # the previous operation removed three rows
+```
+
+### A Classification Tree
+
+Suppose we intend to use our data to construct a tree that predicts the sex of a person based upon where a person prefers to sit, fastest speed he/she has ever driven, and the high-school GPA.  We can construct such a model as follows:
+
+```{r}
+trMod <- tree(sex ~ seat + fastest + GPA, data = s2)
+```
+
+### Ways to View Your Tree
+
+#### Text-Based
+
+For a text-based view of the resulting tree, simply print it out:
+
+```{r}
+trMod
+```
+
+#### Summary
+
+For a summary account:
+
+```{r}
+summary(trMod)
+```
+
+#### Plot
+
+For a plot with textual annotations:
+
+```{r}
+plot(trMod)  # draws the branches
+text(trMod)  # adds the annotation
+```
+
+Note that splits involving the factor variable **seat** are coded by letter of the alphabet, in order of the levels of the factor variable:
+
+* "1_front" is a;
+* "2_middle is b;
+* "3_back" is c.
+
+The letters shown at a given node indicate the left-hand split.  Thus the node annotated as `seat: ac` gets split into two: those who sit in the front or the back go into the terminal node on the left, whereas everyone else---the middle-sitter,s in this case---are placed into a node that is subsequently split according to **GPA**.
+
+### A Regression Tree
+
+When the response variable is numeric then we are making *regression* trees.  The syntax is just the same as for classification trees.  For example, to predict fastest speed every driven from sex, seat, height and GPA, then use:
+
+```{r}
+trFast <- tree(fastest ~ sex + seat + height + GPA, data = s2)
+```
+
+Viewing works just the same way as for classification trees, for example:
+
+```{r}
+plot(trFast); text(trFast)
+```
+
+### Using "All Other" variables as Predictors
+
+If all variables in the data other than the response variable could be used as predictors, then we don't have to type them all in:  instead we just type a `.` after the `~` in the formula, thus:
+
+```{r}
+trModAllVars <- tree(sex~ ., data = s2)
+```
+
+This model predicts sex on the basis of *every other* variable in the data frame.
+
+### Eliminating Spurious Variables
+
+trees Work with factor and numerical variables, but variables such as dates or addresses may not fall meaningfully under either category.  If you want the convenience of the `.` notation, then those spurious variables need to be removed first.
+
+Consider, for example, the `verlander` data frame from the `tigerstats` package:
+
+```{r eval = F}
+help(verlander)
+str(verlander)
+```
+
+```{r echo = F}
+str(verlander)
+```
+
+If we want to predict **pitch_type**, we might not want to use **season** if we plan to do our prediction for pitches in subsequent seasons.  Also, **gamedate** is a Date-variable and cannot reasonably be considered as factor or numerical.  Hence we should remove it, too.
+
+One way to accomplish this is to create a copy of the data frame and replace each of the offending variables in that copy with `NULL`:
+
+```{r}
+ver2 <- verlander
+ver2$season <- NULL
+ver2$gamedate <- NULL
+```
+
+The new frame does not have the variables;
+
+```{r}
+str(ver2)
+```
+
+
+Now we can build our model:
+
+```{r eval = F}
+verMod <- tree(pitch_type ~ ., data = ver2)
+```
+
+## Controlling Tree Growth
+
+We can control the size of the tree with the `tree.control()` function.  Here is an example of its use:
+
+```{r}
+trMod2 <- tree(sex ~ ., data = s2,
+               control = tree.control(
+                 nobs = nrow(s2),
+                 mincut = 2,
+                 minsize = 4,
+                 mindev = 0.001
+               ))
+```
+
+Note that `tree.control()` takes four arguments.  Here's how they work.
+
+### `nobs`
+
+When you are building a tree from data, always set this argument to be the number of observations you have available, i.e,, the number of rows in your data frame.
+
+### `mincut`
+
+When the tree function is at a given node and is considering whether to split the node into two *child nodes*, then each child node has to contain *at least* the number of observations specified by `mincut`.  If this minimum cannot be met then the node won't be split, and it will become a terminal node in the tree.
+
+### `minsize`
+
+For any given node to be split at all, it must contain *at least* the number of observations specified by `minsize`.  If this minimum cannot be met then the node won't be split, and it will become a terminal node in the tree.
+
+Note that `mincut` cannot be set to more than half of `minsize`.
+
+### `mindev`
+
+For any given node to be split, the deviance at this node must be at least `mindev` times the deviance at the root node of the tree (the deviance prior to any splitting).  Thus, if `mindev` is set to 0.01, then the deviance at the node under consideration has to be at least 1% of the root-node deviance.  If this condition cannot be met, then the node under consideration will not be split and will become a terminal mode for the tree.
+
+### Note on `nobs`
+
+You might wonder why we have to set the value of `nobs` at all:  don't we always intend to use all of the observations we have at our disposal?
+
+The reason is that `tree.control()` can be used on its, apart from any data set, to investigate where certain choices might take us.  Thus:
+
+```{r}
+tree.control(nobs = 68,
+            mincut = 2,
+            minsize = 4,
+            mindev = 0.001)
+```
+
+The item `nmax` gives an estimate of the largest number of nodes that might occur when we construct a tree under the conditions given by `nobs`, `mincut`, minsize` and `mindev`.  Here, the largest possible tree would have about 91 nodes.  In practice the number of nodes usually will be much less.  For example, `trMod2` constructed with the above parameters has only five nodes:
+
+```{r}
+summary(trMod2)
+```
+
+You aren't likely use `tree.control()` on its own, but you still need to set `nobs`.
+
+### Tree Size
+
+As a rule, the lower you set `mincut`, `minsize` and `mindev`, the more nodes your tree will have.  At any rate, lowering one of these values will never *decrease* the number of nodes.
+
+### The Default Tree
+
+The default values of `minuct`, minsize` and `mindev` are 5, 10  and 0.01 respectively.  Thus the tree obtained without recourse to `tree.control()`:
+
+```{r eval = F}
+trSex <- tree(sex ~ ., data = s2)
+```
+
+is the same as the tree produced by
+
+```{r eval = F}
+trSex <- tree(sex ~ ., data = s2,
+              control = tree.control(
+                nobs = nrow(s2),
+                mincut = 2,
+                minsize = 4,
+                mindev = 0.01
+              ))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

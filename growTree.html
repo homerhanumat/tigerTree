@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Growing Trees</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<link rel="stylesheet"
+      href="site_libs/highlight/textmate.css"
+      type="text/css" />
+<script src="site_libs/highlight/highlight.js"></script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.9em;
+  padding-left: 5px;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+  padding-left: 10px;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">tigerTree</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="instructorNotes.html">For Instructors</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Vignettes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="growTree.html">Growing Trees</a>
+    </li>
+    <li>
+      <a href="divideTrainTest.html">Testing Trees</a>
+    </li>
+    <li>
+      <a href="treeDetective.html">The Tree Detective</a>
+    </li>
+    <li>
+      <a href="distAtNodes.html">Distribution at the Nodes</a>
+    </li>
+    <li>
+      <a href="tuneTree.html">Tuning Your Tree:  An App</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="resources.html">Related</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a>
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Growing Trees</h1>
+
+</div>
+
+
+<div id="the-tree-function-basic-use" class="section level2">
+<h2>The <code>tree()</code> Function: Basic Use</h2>
+<p>We’ll work with the <code>m111survey</code> data frame from the <code>tigerstats</code> package:</p>
+<pre class="r"><code>help(m111survey)
+str(m111survey)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    71 obs. of  12 variables:
+##  $ height         : num  76 74 64 62 72 70.8 70 79 59 67 ...
+##  $ ideal_ht       : num  78 76 NA 65 72 NA 72 76 61 67 ...
+##  $ sleep          : num  9.5 7 9 7 8 10 4 6 7 7 ...
+##  $ fastest        : int  119 110 85 100 95 100 85 160 90 90 ...
+##  $ weight_feel    : Factor w/ 3 levels &quot;1_underweight&quot;,..: 1 2 2 1 1 3 2 2 2 3 ...
+##  $ love_first     : Factor w/ 2 levels &quot;no&quot;,&quot;yes&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ extra_life     : Factor w/ 2 levels &quot;no&quot;,&quot;yes&quot;: 2 2 1 1 2 1 2 2 2 1 ...
+##  $ seat           : Factor w/ 3 levels &quot;1_front&quot;,&quot;2_middle&quot;,..: 1 2 2 1 3 1 1 3 3 2 ...
+##  $ GPA            : num  3.56 2.5 3.8 3.5 3.2 3.1 3.68 2.7 2.8 NA ...
+##  $ enough_Sleep   : Factor w/ 2 levels &quot;no&quot;,&quot;yes&quot;: 1 1 1 1 1 2 1 2 1 2 ...
+##  $ sex            : Factor w/ 2 levels &quot;female&quot;,&quot;male&quot;: 2 2 1 1 2 2 2 2 1 1 ...
+##  $ diff.ideal.act.: num  2 2 NA 3 0 NA 2 -3 2 0 ...</code></pre>
+<div id="preparing-the-data" class="section level3">
+<h3>Preparing the Data</h3>
+<p><code>tree()</code> likes to work factor or numerical variables (or both), and it complains when there is missing data. If you’ve got <code>NA</code> values in your data, consider removing them all:</p>
+<pre class="r"><code>s2 &lt;- subset(m111survey, complete.cases(m111survey) == T)
+nrow(s2)  # the previous operation removed three rows</code></pre>
+<pre><code>## [1] 68</code></pre>
+</div>
+<div id="a-classification-tree" class="section level3">
+<h3>A Classification Tree</h3>
+<p>Suppose we intend to use our data to construct a tree that predicts the sex of a person based upon where a person prefers to sit, fastest speed he/she has ever driven, and the high-school GPA. We can construct such a model as follows:</p>
+<pre class="r"><code>trMod &lt;- tree(sex ~ seat + fastest + GPA, data = s2)</code></pre>
+</div>
+<div id="ways-to-view-your-tree" class="section level3">
+<h3>Ways to View Your Tree</h3>
+<div id="text-based" class="section level4">
+<h4>Text-Based</h4>
+<p>For a text-based view of the resulting tree, simply print it out:</p>
+<pre class="r"><code>trMod</code></pre>
+<pre><code>## node), split, n, deviance, yval, (yprob)
+##       * denotes terminal node
+## 
+##  1) root 68 93.320 female ( 0.55882 0.44118 )  
+##    2) GPA &lt; 3.1335 25 31.340 male ( 0.32000 0.68000 )  
+##      4) seat: 1_front,3_back 13 17.940 female ( 0.53846 0.46154 ) *
+##      5) seat: 2_middle 12  6.884 male ( 0.08333 0.91667 )  
+##       10) GPA &lt; 2.6 5  5.004 male ( 0.20000 0.80000 ) *
+##       11) GPA &gt; 2.6 7  0.000 male ( 0.00000 1.00000 ) *
+##    3) GPA &gt; 3.1335 43 52.700 female ( 0.69767 0.30233 )  
+##      6) fastest &lt; 106.5 27 25.870 female ( 0.81481 0.18519 )  
+##       12) GPA &lt; 3.715 21 23.050 female ( 0.76190 0.23810 ) *
+##       13) GPA &gt; 3.715 6  0.000 female ( 1.00000 0.00000 ) *
+##      7) fastest &gt; 106.5 16 22.180 female ( 0.50000 0.50000 )  
+##       14) seat: 1_front 8 10.590 female ( 0.62500 0.37500 ) *
+##       15) seat: 2_middle,3_back 8 10.590 male ( 0.37500 0.62500 ) *</code></pre>
+</div>
+<div id="summary" class="section level4">
+<h4>Summary</h4>
+<p>For a summary account:</p>
+<pre class="r"><code>summary(trMod)</code></pre>
+<pre><code>## 
+## Classification tree:
+## tree(formula = sex ~ seat + fastest + GPA, data = s2)
+## Number of terminal nodes:  7 
+## Residual mean deviance:  1.101 = 67.17 / 61 
+## Misclassification error rate: 0.2647 = 18 / 68</code></pre>
+</div>
+<div id="plot" class="section level4">
+<h4>Plot</h4>
+<p>For a plot with textual annotations:</p>
+<pre class="r"><code>plot(trMod)  # draws the branches
+text(trMod)  # adds the annotation</code></pre>
+<p><img src="growTree_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Note that splits involving the factor variable <strong>seat</strong> are coded by letter of the alphabet, in order of the levels of the factor variable:</p>
+<ul>
+<li>“1_front” is a;</li>
+<li>“2_middle is b;</li>
+<li>“3_back” is c.</li>
+</ul>
+<p>The letters shown at a given node indicate the left-hand split. Thus the node annotated as <code>seat: ac</code> gets split into two: those who sit in the front or the back go into the terminal node on the left, whereas everyone else—the middle-sitter,s in this case—are placed into a node that is subsequently split according to <strong>GPA</strong>.</p>
+</div>
+</div>
+<div id="a-regression-tree" class="section level3">
+<h3>A Regression Tree</h3>
+<p>When the response variable is numeric then we are making <em>regression</em> trees. The syntax is just the same as for classification trees. For example, to predict fastest speed every driven from sex, seat, height and GPA, then use:</p>
+<pre class="r"><code>trFast &lt;- tree(fastest ~ sex + seat + height + GPA, data = s2)</code></pre>
+<p>Viewing works just the same way as for classification trees, for example:</p>
+<pre class="r"><code>plot(trFast); text(trFast)</code></pre>
+<p><img src="growTree_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+<div id="using-all-other-variables-as-predictors" class="section level3">
+<h3>Using “All Other” variables as Predictors</h3>
+<p>If all variables in the data other than the response variable could be used as predictors, then we don’t have to type them all in: instead we just type a <code>.</code> after the <code>~</code> in the formula, thus:</p>
+<pre class="r"><code>trModAllVars &lt;- tree(sex~ ., data = s2)</code></pre>
+<p>This model predicts sex on the basis of <em>every other</em> variable in the data frame.</p>
+</div>
+<div id="eliminating-spurious-variables" class="section level3">
+<h3>Eliminating Spurious Variables</h3>
+<p>trees Work with factor and numerical variables, but variables such as dates or addresses may not fall meaningfully under either category. If you want the convenience of the <code>.</code> notation, then those spurious variables need to be removed first.</p>
+<p>Consider, for example, the <code>verlander</code> data frame from the <code>tigerstats</code> package:</p>
+<pre class="r"><code>help(verlander)
+str(verlander)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    15307 obs. of  12 variables:
+##  $ season     : int  2009 2009 2009 2009 2009 2009 2009 2009 2009 2009 ...
+##  $ gamedate   : Date, format: &quot;2009-04-06&quot; &quot;2009-04-06&quot; ...
+##  $ pitch_type : Factor w/ 5 levels &quot;CH&quot;,&quot;CU&quot;,&quot;FF&quot;,..: 3 2 2 2 3 2 3 3 3 1 ...
+##  $ balls      : int  0 0 1 1 1 1 2 3 0 0 ...
+##  $ strikes    : int  0 1 1 2 2 2 2 2 0 1 ...
+##  $ pitches    : int  0 1 2 3 4 5 6 7 8 9 ...
+##  $ speed      : num  96.6 81.1 80.4 83.1 97.9 82.6 98.7 97.1 97.8 85.8 ...
+##  $ px         : num  -0.43 -0.43 -0.17 -0.76 -0.31 0.32 0.72 0.51 -0.45 -0.89 ...
+##  $ pz         : num  3.24 3.79 2.98 3.45 2.5 1.3 3.3 2.37 2.29 2.1 ...
+##  $ pfx_x      : num  -4.44 5.53 4.83 4.21 -6.64 5.21 -7.65 -5.1 -8.07 -6.67 ...
+##  $ pfx_z      : num  9.28 -8.28 -8.03 -9.33 6.3 -8.44 4.77 6.29 7.38 4.47 ...
+##  $ batter_hand: Factor w/ 2 levels &quot;L&quot;,&quot;R&quot;: 2 2 2 2 2 2 2 2 2 2 ...</code></pre>
+<p>If we want to predict <strong>pitch_type</strong>, we might not want to use <strong>season</strong> if we plan to do our prediction for pitches in subsequent seasons. Also, <strong>gamedate</strong> is a Date-variable and cannot reasonably be considered as factor or numerical. Hence we should remove it, too.</p>
+<p>One way to accomplish this is to create a copy of the data frame and replace each of the offending variables in that copy with <code>NULL</code>:</p>
+<pre class="r"><code>ver2 &lt;- verlander
+ver2$season &lt;- NULL
+ver2$gamedate &lt;- NULL</code></pre>
+<p>The new frame does not have the variables;</p>
+<pre class="r"><code>str(ver2)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    15307 obs. of  10 variables:
+##  $ pitch_type : Factor w/ 5 levels &quot;CH&quot;,&quot;CU&quot;,&quot;FF&quot;,..: 3 2 2 2 3 2 3 3 3 1 ...
+##  $ balls      : int  0 0 1 1 1 1 2 3 0 0 ...
+##  $ strikes    : int  0 1 1 2 2 2 2 2 0 1 ...
+##  $ pitches    : int  0 1 2 3 4 5 6 7 8 9 ...
+##  $ speed      : num  96.6 81.1 80.4 83.1 97.9 82.6 98.7 97.1 97.8 85.8 ...
+##  $ px         : num  -0.43 -0.43 -0.17 -0.76 -0.31 0.32 0.72 0.51 -0.45 -0.89 ...
+##  $ pz         : num  3.24 3.79 2.98 3.45 2.5 1.3 3.3 2.37 2.29 2.1 ...
+##  $ pfx_x      : num  -4.44 5.53 4.83 4.21 -6.64 5.21 -7.65 -5.1 -8.07 -6.67 ...
+##  $ pfx_z      : num  9.28 -8.28 -8.03 -9.33 6.3 -8.44 4.77 6.29 7.38 4.47 ...
+##  $ batter_hand: Factor w/ 2 levels &quot;L&quot;,&quot;R&quot;: 2 2 2 2 2 2 2 2 2 2 ...</code></pre>
+<p>Now we can build our model:</p>
+<pre class="r"><code>verMod &lt;- tree(pitch_type ~ ., data = ver2)</code></pre>
+</div>
+</div>
+<div id="controlling-tree-growth" class="section level2">
+<h2>Controlling Tree Growth</h2>
+<p>We can control the size of the tree with the <code>tree.control()</code> function. Here is an example of its use:</p>
+<pre class="r"><code>trMod2 &lt;- tree(sex ~ ., data = s2,
+               control = tree.control(
+                 nobs = nrow(s2),
+                 mincut = 2,
+                 minsize = 4,
+                 mindev = 0.001
+               ))</code></pre>
+<p>Note that <code>tree.control()</code> takes four arguments. Here’s how they work.</p>
+<div id="nobs" class="section level3">
+<h3><code>nobs</code></h3>
+<p>When you are building a tree from data, always set this argument to be the number of observations you have available, i.e,, the number of rows in your data frame.</p>
+</div>
+<div id="mincut" class="section level3">
+<h3><code>mincut</code></h3>
+<p>When the tree function is at a given node and is considering whether to split the node into two <em>child nodes</em>, then each child node has to contain <em>at least</em> the number of observations specified by <code>mincut</code>. If this minimum cannot be met then the node won’t be split, and it will become a terminal node in the tree.</p>
+</div>
+<div id="minsize" class="section level3">
+<h3><code>minsize</code></h3>
+<p>For any given node to be split at all, it must contain <em>at least</em> the number of observations specified by <code>minsize</code>. If this minimum cannot be met then the node won’t be split, and it will become a terminal node in the tree.</p>
+<p>Note that <code>mincut</code> cannot be set to more than half of <code>minsize</code>.</p>
+</div>
+<div id="mindev" class="section level3">
+<h3><code>mindev</code></h3>
+<p>For any given node to be split, the deviance at this node must be at least <code>mindev</code> times the deviance at the root node of the tree (the deviance prior to any splitting). Thus, if <code>mindev</code> is set to 0.01, then the deviance at the node under consideration has to be at least 1% of the root-node deviance. If this condition cannot be met, then the node under consideration will not be split and will become a terminal mode for the tree.</p>
+</div>
+<div id="note-on-nobs" class="section level3">
+<h3>Note on <code>nobs</code></h3>
+<p>You might wonder why we have to set the value of <code>nobs</code> at all: don’t we always intend to use all of the observations we have at our disposal?</p>
+<p>The reason is that <code>tree.control()</code> can be used on its, apart from any data set, to investigate where certain choices might take us. Thus:</p>
+<pre class="r"><code>tree.control(nobs = 68,
+            mincut = 2,
+            minsize = 4,
+            mindev = 0.001)</code></pre>
+<pre><code>## $mincut
+## [1] 2
+## 
+## $minsize
+## [1] 4
+## 
+## $mindev
+## [1] 0.001
+## 
+## $nmax
+## [1] 91
+## 
+## $nobs
+## [1] 68</code></pre>
+<p>The item <code>nmax</code> gives an estimate of the largest number of nodes that might occur when we construct a tree under the conditions given by <code>nobs</code>, <code>mincut</code>, minsize<code>and</code>mindev<code>.  Here, the largest possible tree would have about 91 nodes.  In practice the number of nodes usually will be much less.  For example,</code>trMod2` constructed with the above parameters has only five nodes:</p>
+<pre class="r"><code>summary(trMod2)</code></pre>
+<pre><code>## 
+## Classification tree:
+## tree(formula = sex ~ ., data = s2, control = tree.control(nobs = nrow(s2), 
+##     mincut = 2, minsize = 4, mindev = 0.001))
+## Variables actually used in tree construction:
+## [1] &quot;ideal_ht&quot; &quot;GPA&quot;      &quot;height&quot;  
+## Number of terminal nodes:  5 
+## Residual mean deviance:  0.1046 = 6.592 / 63 
+## Misclassification error rate: 0.02941 = 2 / 68</code></pre>
+<p>You aren’t likely use <code>tree.control()</code> on its own, but you still need to set <code>nobs</code>.</p>
+</div>
+<div id="tree-size" class="section level3">
+<h3>Tree Size</h3>
+<p>As a rule, the lower you set <code>mincut</code>, <code>minsize</code> and <code>mindev</code>, the more nodes your tree will have. At any rate, lowering one of these values will never <em>decrease</em> the number of nodes.</p>
+</div>
+<div id="the-default-tree" class="section level3">
+<h3>The Default Tree</h3>
+<p>The default values of <code>minuct</code>, minsize<code>and</code>mindev<code>are 5, 10  and 0.01 respectively.  Thus the tree obtained without recourse to</code>tree.control()`:</p>
+<pre class="r"><code>trSex &lt;- tree(sex ~ ., data = s2)</code></pre>
+<p>is the same as the tree produced by</p>
+<pre class="r"><code>trSex &lt;- tree(sex ~ ., data = s2,
+              control = tree.control(
+                nobs = nrow(s2),
+                mincut = 2,
+                minsize = 4,
+                mindev = 0.01
+              ))</code></pre>
+</div>
+</div>
+
+
+
+<!-- bizible -->
+<script type="text/javascript" src="//cdn.bizible.com/scripts/bizible.js" async=""></script>
+
+
+<!-- disqus -->
+<!--  <div id="disqus_thread" style="margin-top: 45px;"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
