@@ -10,4 +10,4 @@ output:
       collapsed: false
     includes:
       after_body: include/after_body.html
-css: styles.css
+    css: styles.css
