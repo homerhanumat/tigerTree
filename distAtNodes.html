@@ -339,7 +339,88 @@ div.tocify {
 </div>
 
 
-<p>TODO</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Sometime we build a classification tree, not in order to make a prediction for an individual, but rather to identify “groups” of individuals that have an elevated probability of possessing a particular characteristic.</p>
+<p>For example, suppose that in the case of Justin Verlander’s pitches we would like to say which sorts of pitches are especially likely to be curve balls (value “CU”).</p>
+<p>First let’s set up the data frame:</p>
+<pre class="r"><code>ver2 &lt;- verlander
+ver2$season &lt;- NULL
+ver2$gamedate &lt;- NULL</code></pre>
+<p>Now we divide the data into training and test sets:</p>
+<pre class="r"><code>dfs &lt;- divideTrainTest(seed = 3030, prop.train = 0.5, data = ver2)
+verTrain &lt;- dfs$train
+verTest &lt;- dfs$test</code></pre>
+<p>Then we build a tree on the training set:</p>
+<pre class="r"><code>trMod &lt;- tree(pitch_type ~ ., data = verTrain)
+trMod</code></pre>
+<pre><code>## node), split, n, deviance, yval, (yprob)
+##       * denotes terminal node
+## 
+##  1) root 7653 22050.00 FF ( 0.1643800 0.1821508 0.4398275 0.1305370 0.0831047 )  
+##    2) speed &lt; 91.85 3331  7421.00 CU ( 0.3767637 0.4184929 0.0024017 0.0114080 0.1909337 )  
+##      4) pfx_x &lt; -2.465 1328   719.40 CH ( 0.9435241 0.0000000 0.0060241 0.0286145 0.0218373 ) *
+##      5) pfx_x &gt; -2.465 2003  2488.00 CU ( 0.0009985 0.6959561 0.0000000 0.0000000 0.3030454 )  
+##       10) pfx_z &lt; -2.995 1363   257.40 CU ( 0.0000000 0.9809244 0.0000000 0.0000000 0.0190756 ) *
+##       11) pfx_z &gt; -2.995 640   411.20 SL ( 0.0031250 0.0890625 0.0000000 0.0000000 0.9078125 )  
+##         22) pfx_x &lt; 4.715 553    52.95 SL ( 0.0036166 0.0036166 0.0000000 0.0000000 0.9927667 ) *
+##         23) pfx_x &gt; 4.715 87   114.50 CU ( 0.0000000 0.6321839 0.0000000 0.0000000 0.3678161 ) *
+##    3) speed &gt; 91.85 4322  4628.00 FF ( 0.0006941 0.0000000 0.7769551 0.2223508 0.0000000 )  
+##      6) pfx_x &lt; -8.365 968   370.10 FT ( 0.0000000 0.0000000 0.0475207 0.9524793 0.0000000 ) *
+##      7) pfx_x &gt; -8.365 3354   473.00 FF ( 0.0008945 0.0000000 0.9874776 0.0116279 0.0000000 ) *</code></pre>
+<p>We can tell that pitches at terminal nodes 10 and 23 are especially likely to be curve balls.</p>
+</div>
+<div id="distribution-at-the-nodes-taining-set" class="section level2">
+<h2>Distribution at the Nodes: Taining Set</h2>
+<p>The <code>distAtNodes()</code> function gives us this information directly, in the form of a table:</p>
+<pre class="r"><code>trainTab &lt;- distAtNodes(trMod, df = verTrain, resp_varname = &quot;pitch_type&quot;)
+trainTab</code></pre>
+<pre><code>##     pitch_type
+## node   CH   CU   FF   FT   SL
+##   4  1253    0    8   38   29
+##   6     0    0   46  922    0
+##   7     3    0 3312   39    0
+##   10    0 1337    0    0   26
+##   22    2    2    0    0  549
+##   23    0   55    0    0   32</code></pre>
+<pre class="r"><code>rowPerc(trainTab)</code></pre>
+<pre><code>##     pitch_type
+## node     CH     CU     FF     FT     SL  Total
+##   4   94.35   0.00   0.60   2.86   2.18 100.00
+##   6    0.00   0.00   4.75  95.25   0.00 100.00
+##   7    0.09   0.00  98.75   1.16   0.00 100.00
+##   10   0.00  98.09   0.00   0.00   1.91 100.00
+##   22   0.36   0.36   0.00   0.00  99.28 100.00
+##   23   0.00  63.22   0.00   0.00  36.78 100.00</code></pre>
+</div>
+<div id="distribution-at-the-nodes-taining-set-1" class="section level2">
+<h2>Distribution at the Nodes: Taining Set</h2>
+<p>The model points to two nodes as having “high-likelihood nodes” for curve-balls. But a more reliable estimate of the probability of a curve-ball at each of these nodes is provided by applying the model to <em>new</em> data, not the data that is used to build the model itself. Hence we also use the <code>distAtNodes()</code> function on the model and the <em>test</em> set:</p>
+<pre class="r"><code>testTab &lt;- distAtNodes(trMod, df = verTest, resp_varname = &quot;pitch_type&quot;)
+testTab</code></pre>
+<pre><code>##     pitch_type
+## node   CH   CU   FF   FT   SL
+##   4  1287    0   13   28   22
+##   6     0    0   47  943    0
+##   7     0    0 3330   51    4
+##   10    0 1248    0    0   30
+##   22    5   13    0    0  545
+##   23    0   61    0    0   27</code></pre>
+<pre class="r"><code>rowPerc(testTab)</code></pre>
+<pre><code>##     pitch_type
+## node     CH     CU     FF     FT     SL  Total
+##   4   95.33   0.00   0.96   2.07   1.63 100.00
+##   6    0.00   0.00   4.75  95.25   0.00 100.00
+##   7    0.00   0.00  98.38   1.51   0.12 100.00
+##   10   0.00  97.65   0.00   0.00   2.35 100.00
+##   22   0.89   2.31   0.00   0.00  96.80 100.00
+##   23   0.00  69.32   0.00   0.00  30.68 100.00</code></pre>
+<p>Again nodes 10 and 23 stand out—and with about the same probability of curve-ball at each node.</p>
+</div>
+<div id="caution" class="section level2">
+<h2>Caution</h2>
+<p>When a node does not contains a large number of individuals, estimates of distribution of the response variable at that node is subject to a great deal of chance variation. Watch for this especially when you are building trees with many nodes, or when your training or test sets are not large to being with.</p>
+</div>
 
 
 

@@ -12,4 +12,69 @@ library(tigerstats)
 library(tigerTree)
 ```
 
-TODO
+## Introduction
+
+Sometime we build a classification tree, not in order to make a prediction for an individual, but rather to identify "groups" of individuals that have an elevated probability of possessing a particular characteristic.
+
+For example, suppose that in the case of Justin Verlander's pitches we would like to say which sorts of pitches are especially likely to be curve balls (value "CU").
+
+First let's set up the data frame:
+
+```{r}
+ver2 <- verlander
+ver2$season <- NULL
+ver2$gamedate <- NULL
+```
+
+Now we divide the data into training and test sets:
+
+```{r}
+dfs <- divideTrainTest(seed = 3030, prop.train = 0.5, data = ver2)
+verTrain <- dfs$train
+verTest <- dfs$test
+```
+
+Then we build a tree on the training set:
+
+```{r}
+trMod <- tree(pitch_type ~ ., data = verTrain)
+trMod
+```
+
+We can tell that pitches at terminal nodes 10 and 23 are especially likely to be curve balls.
+
+## Distribution at the Nodes:  Taining Set
+
+The `distAtNodes()` function gives us this information directly, in the form of a table:
+
+```{r}
+trainTab <- distAtNodes(trMod, df = verTrain, resp_varname = "pitch_type")
+trainTab
+rowPerc(trainTab)
+```
+
+## Distribution at the Nodes:  Taining Set
+
+The model points to two nodes as having "high-likelihood nodes" for curve-balls.  But a more reliable estimate of the probability of a curve-ball at each of these nodes  is provided by applying the model to *new* data, not the data that is used to build the model itself.  Hence we also use the `distAtNodes()` function on the model and the *test* set:
+
+```{r}
+testTab <- distAtNodes(trMod, df = verTest, resp_varname = "pitch_type")
+testTab
+rowPerc(testTab)
+```
+
+Again nodes 10 and 23 stand out---and with about the same probability of curve-ball at each node.
+
+## Caution
+
+When a node does not contains a large number of individuals, estimates of distribution of the response variable at that node is subject to a great deal of chance variation.  Watch for this especially when you are building trees with many nodes, or when your training or test sets are not large to being with. 
+
+
+
+
+
+
+
+
+
+
