@@ -1,5 +1,5 @@
 ---
-title: "Dividing Data into Training, Quiz and Test Sets"
+title: "Dividing Data and Testing Tree Models"
 output:
   html_document:
     toc: yes
@@ -12,4 +12,198 @@ library(tigerstats)
 library(tigerTree)
 ```
 
-TODO
+## The Idea of Training and Test
+
+When you have made a predictive model it's important to estimate how well it would perform on *new* observations---that is, on observations that are different from the ones that were used to build the model in the first place.  This cannot be done if you use all of the available data to build your model.  Hence it is usually recommended to divide your data into two sets:
+
+* a training set, and
+* a test set.
+
+The training set will be used to build the model.  The model is then tested on the test set.  How well it performs on the test set is likely to be a more reliable indicator of its performance "in the field" on new observations than how it performs on the very training set that it was built upon.
+
+In order to remove any possibility of researcher-bias, this division should be performed randomly by the computer.
+
+## Training and Test:  Example
+
+We'll use the `verlander` data frame from the `tigerstats` package:
+
+```{r eval = F}
+library(tigerstats)
+help(verlander)
+str(verlander)
+```
+
+```{r echo = F}
+str(verlander)
+```
+
+
+Our goal is to build a model to predict how the pitchFX machine would classify a Justin Verlander pitch.  In other words, we would like to predict **pitch_type** from the other factor and numerical variables in the data frame.
+
+Trees can't work with dates, and the the season won't be relevant if we want to use the tree to predict pitches for future seasons, so we create a frame without those variables:
+
+```{r}
+ver2 <- verlander
+ver2$season <- NULL
+ver2$gamedate <- NULL
+```
+
+Let's say that we plan to build just one tree model.  Then it's appropriate to divide the data into a training and a test set.  We can do with is the `divideTrainTest()` function:
+
+```{r}
+myTrainTest <- divideTrainTest(seed = 4040, prop.train = 0.7, data = ver2)
+```
+
+The `sees` argument can be any integer; setting the seed guarantees the reproducibility of your work while making the division "look random."  Setting `prop.train` to 0.7 ensures an approximately 70%-30% split between training and test sets.
+
+The result is list of two desired data frames:
+
+```{r}
+str(myTrainTest)
+```
+
+For convenience, let's give them shorter names:
+
+```{r}
+verTrain <- myTrainTest$train  #the training set
+verTest <-  myTrainTest$test  #the test set
+```
+
+Now you are ready to build your model, using the training set.
+
+
+```{r}
+verMod <- tree(pitch_type ~ ., data = verTrain)
+plot(verMod); text(verMod)
+```
+
+Let's see how well the tree worked on the data used to build it:
+
+```{r}
+summary(verMod)
+```
+
+The misclassification rate was 3.248%.
+
+The `tryTree()` function can be used to see how well the tree performs on the test set:
+
+```{r}
+tryTree(mod = verMod, testSet = verTest, 
+        truth = verTest$pitch_type)
+```
+
+As one might expect, the misclassification rate is a bit higher on the new data:  about 3.4%.
+
+**Note:**  It is possible to "try" the tree on the training set:
+
+```{r}
+tryTree(mod = verMod, testSet = verTrain, 
+        truth = verTrain$pitch_type)
+```
+
+
+
+##  Multiple Models:  Using a Quiz Set
+
+More often than not, you would like to build several tree models and compare them, choosing the one that works best.  If do the comparisons on the test set, then you are using the test set as *part* of the training set, so it won't be "new data" any more.  Hence when you plan to build and compare multiple models, the training set should be further subdivided into a set used to build all of the models and another set, called the *quiz* set, that provides "new data" on which the candidate models will be compared.
+
+This results in a three-fold division of the available data:
+
+* training set (build all models here)
+* quiz set (try out all models here and pick your favorite)
+* test set (test your favorite model here)
+
+This division can be accomplished by adding a new argument, `prop.quiz`, to the `divideTrainTest()` function:
+
+```{r}
+my3Frames <- divideTrainTest(seed = 4040, prop.train = 0.6, 
+                             prop.quiz = 0.2, data = ver2)
+```
+
+The resulting division is 60% training, 20% quiz and 20% test.
+
+Now you can build as many models as you like:
+
+```{r}
+verTrain <- my3Frames$train
+verQuiz <- my3Frames$quiz
+verTest <- my3Frames$test
+verMod1 <- tree(pitch_type ~ ., data = verTrain,
+                control = tree.control(
+                  nobs = nrow(verTrain),
+                  mincut = 100,
+                  minsize = 200,
+                  mindev = 0.1
+                ))
+summary(verMod1)
+tryTree(mod = verMod1, testSet = verQuiz, truth = verQuiz$pitch_type)
+```
+
+The first tree we made has only four nodes, and misclassification rate on the quiz data is very high:  about 10.16%.
+
+Let's make another, very large tree:
+
+```{r}
+verMod2 <- tree(pitch_type ~ ., data = verTrain,
+                control = tree.control(
+                  nobs = nrow(verTrain),
+                  mincut = 1,
+                  minsize = 2,
+                  mindev = 0
+                ))
+summary(verMod2)
+tryTree(mod = verMod2, testSet = verQuiz, truth = verQuiz$pitch_type)
+```
+
+Model 2 has very many nodes, and although the misclassification rate on its own data is 0%, the rate on the quiz set is about 2.58%.  That's the rate we care about!
+
+Let's try a model that is "intermediate" in size:
+
+```{r}
+verMod3 <- tree(pitch_type ~ ., data = verTrain,
+                control = tree.control(
+                  nobs = nrow(verTrain),
+                  mincut = 5,
+                  minsize = 10,
+                  mindev = 0.0003
+                ))
+summary(verMod3)
+tryTree(mod = verMod3, testSet = verQuiz, truth = verQuiz$pitch_type)
+```
+
+This tree has a lower misclassification rate:  about 2.22%.
+
+And finally, a tree that is rather on the small side:
+
+```{r}
+verMod4 <- tree(pitch_type ~ ., data = verTrain,
+                control = tree.control(
+                  nobs = nrow(verTrain),
+                  mincut = 5,
+                  minsize = 10,
+                  mindev = 0.01
+                ))
+summary(verMod4)
+tryTree(mod = verMod4, testSet = verQuiz, truth = verQuiz$pitch_type)
+```
+
+This last tree has a reasonably low misclassification rate of about 3.3%, but that's not the lowest rate we have seen.  With only six nodes, though, Model 4 is small enough to plot and will be easier for non-technical people to understand.
+
+Which tree should we go with? That's a judgment call that depends on the practical context of the problem.
+
+Let's say that we decide to go with Model 4.  Our last act is to test this model on the test set:
+
+
+```{r}
+tryTree(mod = verMod4, testSet = verTest, truth = verTest$pitch_type)
+```
+
+Based on the result, we figure that our chosen model will have about a 3.4% error rate on new but similar observations of Justin Verlander pitches.
+
+**Note:  remember to stick with the model you chose!  Don't go back and try another candidate model on your test set!**
+
+
+
+
+
+

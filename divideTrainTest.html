@@ -11,7 +11,7 @@
 
 
 
-<title>Dividing Data into Training, Quiz and Test Sets</title>
+<title>Dividing Data and Testing Tree Models</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
@@ -298,10 +298,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="divideTrainTest.html">Train/Quiz/Test Division</a>
-    </li>
-    <li>
-      <a href="tryTree.html">Trying Out Your Tree</a>
+      <a href="divideTrainTest.html">Testing Trees</a>
     </li>
     <li>
       <a href="treeDetective.html">The Tree Detective</a>
@@ -310,7 +307,7 @@ div.tocify {
       <a href="distAtNodes.html">Distribtution at the Nodes</a>
     </li>
     <li>
-      <a href="tuneTree.html">Tuning Your Tree</a>
+      <a href="tuneTree.html">Tuning Your Tree:  An App</a>
     </li>
   </ul>
 </li>
@@ -334,12 +331,269 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Dividing Data into Training, Quiz and Test Sets</h1>
+<h1 class="title toc-ignore">Dividing Data and Testing Tree Models</h1>
 
 </div>
 
 
-<p>TODO</p>
+<div id="the-idea-of-training-and-test" class="section level2">
+<h2>The Idea of Training and Test</h2>
+<p>When you have made a predictive model it’s important to estimate how well it would perform on <em>new</em> observations—that is, on observations that are different from the ones that were used to build the model in the first place. This cannot be done if you use all of the available data to build your model. Hence it is usually recommended to divide your data into two sets:</p>
+<ul>
+<li>a training set, and</li>
+<li>a test set.</li>
+</ul>
+<p>The training set will be used to build the model. The model is then tested on the test set. How well it performs on the test set is likely to be a more reliable indicator of its performance “in the field” on new observations than how it performs on the very training set that it was built upon.</p>
+<p>In order to remove any possibility of researcher-bias, this division should be performed randomly by the computer.</p>
+</div>
+<div id="training-and-test-example" class="section level2">
+<h2>Training and Test: Example</h2>
+<p>We’ll use the <code>verlander</code> data frame from the <code>tigerstats</code> package:</p>
+<pre class="r"><code>library(tigerstats)
+help(verlander)
+str(verlander)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    15307 obs. of  12 variables:
+##  $ season     : int  2009 2009 2009 2009 2009 2009 2009 2009 2009 2009 ...
+##  $ gamedate   : Date, format: &quot;2009-04-06&quot; &quot;2009-04-06&quot; ...
+##  $ pitch_type : Factor w/ 5 levels &quot;CH&quot;,&quot;CU&quot;,&quot;FF&quot;,..: 3 2 2 2 3 2 3 3 3 1 ...
+##  $ balls      : int  0 0 1 1 1 1 2 3 0 0 ...
+##  $ strikes    : int  0 1 1 2 2 2 2 2 0 1 ...
+##  $ pitches    : int  0 1 2 3 4 5 6 7 8 9 ...
+##  $ speed      : num  96.6 81.1 80.4 83.1 97.9 82.6 98.7 97.1 97.8 85.8 ...
+##  $ px         : num  -0.43 -0.43 -0.17 -0.76 -0.31 0.32 0.72 0.51 -0.45 -0.89 ...
+##  $ pz         : num  3.24 3.79 2.98 3.45 2.5 1.3 3.3 2.37 2.29 2.1 ...
+##  $ pfx_x      : num  -4.44 5.53 4.83 4.21 -6.64 5.21 -7.65 -5.1 -8.07 -6.67 ...
+##  $ pfx_z      : num  9.28 -8.28 -8.03 -9.33 6.3 -8.44 4.77 6.29 7.38 4.47 ...
+##  $ batter_hand: Factor w/ 2 levels &quot;L&quot;,&quot;R&quot;: 2 2 2 2 2 2 2 2 2 2 ...</code></pre>
+<p>Our goal is to build a model to predict how the pitchFX machine would classify a Justin Verlander pitch. In other words, we would like to predict <strong>pitch_type</strong> from the other factor and numerical variables in the data frame.</p>
+<p>Trees can’t work with dates, and the the season won’t be relevant if we want to use the tree to predict pitches for future seasons, so we create a frame without those variables:</p>
+<pre class="r"><code>ver2 &lt;- verlander
+ver2$season &lt;- NULL
+ver2$gamedate &lt;- NULL</code></pre>
+<p>Let’s say that we plan to build just one tree model. Then it’s appropriate to divide the data into a training and a test set. We can do with is the <code>divideTrainTest()</code> function:</p>
+<pre class="r"><code>myTrainTest &lt;- divideTrainTest(seed = 4040, prop.train = 0.7, data = ver2)</code></pre>
+<p>The <code>sees</code> argument can be any integer; setting the seed guarantees the reproducibility of your work while making the division “look random.” Setting <code>prop.train</code> to 0.7 ensures an approximately 70%-30% split between training and test sets.</p>
+<p>The result is list of two desired data frames:</p>
+<pre class="r"><code>str(myTrainTest)</code></pre>
+<pre><code>## List of 2
+##  $ test :&#39;data.frame&#39;:   4593 obs. of  10 variables:
+##   ..$ pitch_type : Factor w/ 5 levels &quot;CH&quot;,&quot;CU&quot;,&quot;FF&quot;,..: 2 2 2 3 2 3 2 3 3 1 ...
+##   ..$ balls      : int [1:4593] 0 1 1 1 1 2 1 0 1 2 ...
+##   ..$ strikes    : int [1:4593] 1 1 2 2 2 1 0 0 1 1 ...
+##   ..$ pitches    : int [1:4593] 1 2 3 4 5 11 14 19 21 22 ...
+##   ..$ speed      : num [1:4593] 81.1 80.4 83.1 97.9 82.6 98.3 81.4 96.9 96.9 83.7 ...
+##   ..$ px         : num [1:4593] -0.43 -0.17 -0.76 -0.31 0.32 0.64 1.06 0.79 1.25 -0.91 ...
+##   ..$ pz         : num [1:4593] 3.79 2.98 3.45 2.5 1.3 4 2.08 2.73 4.11 3.02 ...
+##   ..$ pfx_x      : num [1:4593] 5.53 4.83 4.21 -6.64 5.21 -5.75 3.07 -6.19 -4.72 -6.86 ...
+##   ..$ pfx_z      : num [1:4593] -8.28 -8.03 -9.33 6.3 -8.44 7.43 -9.19 8.62 7.86 4.99 ...
+##   ..$ batter_hand: Factor w/ 2 levels &quot;L&quot;,&quot;R&quot;: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ train:&#39;data.frame&#39;:   10714 obs. of  10 variables:
+##   ..$ pitch_type : Factor w/ 5 levels &quot;CH&quot;,&quot;CU&quot;,&quot;FF&quot;,..: 3 3 3 3 1 2 3 2 3 3 ...
+##   ..$ balls      : int [1:10714] 0 2 3 0 0 1 2 0 2 3 ...
+##   ..$ strikes    : int [1:10714] 0 2 2 0 1 1 2 0 0 0 ...
+##   ..$ pitches    : int [1:10714] 0 6 7 8 9 10 12 13 15 16 ...
+##   ..$ speed      : num [1:10714] 96.6 98.7 97.1 97.8 85.8 81.8 99 82.1 98.3 97.7 ...
+##   ..$ px         : num [1:10714] -0.43 0.72 0.51 -0.45 -0.89 -1.54 0.42 0.7 1.5 0.38 ...
+##   ..$ pz         : num [1:10714] 3.24 3.3 2.37 2.29 2.1 3.63 3.11 1.65 2.76 2.7 ...
+##   ..$ pfx_x      : num [1:10714] -4.44 -7.65 -5.1 -8.07 -6.67 4.4 -5.51 2.45 -6.06 -5.87 ...
+##   ..$ pfx_z      : num [1:10714] 9.28 4.77 6.29 7.38 4.47 -7.93 7.69 -7.38 8.04 8.98 ...
+##   ..$ batter_hand: Factor w/ 2 levels &quot;L&quot;,&quot;R&quot;: 2 2 2 2 2 2 2 2 2 2 ...</code></pre>
+<p>For convenience, let’s give them shorter names:</p>
+<pre class="r"><code>verTrain &lt;- myTrainTest$train  #the training set
+verTest &lt;-  myTrainTest$test  #the test set</code></pre>
+<p>Now you are ready to build your model, using the training set.</p>
+<pre class="r"><code>verMod &lt;- tree(pitch_type ~ ., data = verTrain)
+plot(verMod); text(verMod)</code></pre>
+<p><img src="divideTrainTest_files/figure-html/unnamed-chunk-8-1.png" width="528" /></p>
+<p>Let’s see how well the tree worked on the data used to build it:</p>
+<pre class="r"><code>summary(verMod)</code></pre>
+<pre><code>## 
+## Classification tree:
+## tree(formula = pitch_type ~ ., data = verTrain)
+## Variables actually used in tree construction:
+## [1] &quot;speed&quot; &quot;pfx_x&quot; &quot;pfx_z&quot;
+## Number of terminal nodes:  6 
+## Residual mean deviance:  0.2612 = 2796 / 10710 
+## Misclassification error rate: 0.03248 = 348 / 10714</code></pre>
+<p>The misclassification rate was 3.248%.</p>
+<p>The <code>tryTree()</code> function can be used to see how well the tree performs on the test set:</p>
+<pre class="r"><code>tryTree(mod = verMod, testSet = verTest, 
+        truth = verTest$pitch_type)</code></pre>
+<pre><code>## Errors:  156.  Quiz/Test Set Size:  4593.
+## Error Rate is 0.034.
+## Confusion matrix:
+##           truth
+## prediction   CH   CU   FF   FT   SL
+##         CH  760    0    2   19   11
+##         CU    0  780    0    0   28
+##         FF    3    0 1996   16    3
+##         FT    0    0   46  570    0
+##         SL    5   23    0    0  331</code></pre>
+<p>As one might expect, the misclassification rate is a bit higher on the new data: about 3.4%.</p>
+<p><strong>Note:</strong> It is possible to “try” the tree on the training set:</p>
+<pre class="r"><code>tryTree(mod = verMod, testSet = verTrain, 
+        truth = verTrain$pitch_type)</code></pre>
+<pre><code>## Errors:  348.  Quiz/Test Set Size:  10714.
+## Error Rate is 0.0325.
+## Confusion matrix:
+##           truth
+## prediction   CH   CU   FF   FT   SL
+##         CH 1767    0    1   37   40
+##         CU    0 1875    0    0   73
+##         FF   13    0 4607   36    4
+##         FT    0    0  104 1343    0
+##         SL    2   38    0    0  774</code></pre>
+</div>
+<div id="multiple-models-using-a-quiz-set" class="section level2">
+<h2>Multiple Models: Using a Quiz Set</h2>
+<p>More often than not, you would like to build several tree models and compare them, choosing the one that works best. If do the comparisons on the test set, then you are using the test set as <em>part</em> of the training set, so it won’t be “new data” any more. Hence when you plan to build and compare multiple models, the training set should be further subdivided into a set used to build all of the models and another set, called the <em>quiz</em> set, that provides “new data” on which the candidate models will be compared.</p>
+<p>This results in a three-fold division of the available data:</p>
+<ul>
+<li>training set (build all models here)</li>
+<li>quiz set (try out all models here and pick your favorite)</li>
+<li>test set (test your favorite model here)</li>
+</ul>
+<p>This division can be accomplished by adding a new argument, <code>prop.quiz</code>, to the <code>divideTrainTest()</code> function:</p>
+<pre class="r"><code>my3Frames &lt;- divideTrainTest(seed = 4040, prop.train = 0.6, 
+                             prop.quiz = 0.2, data = ver2)</code></pre>
+<p>The resulting division is 60% training, 20% quiz and 20% test.</p>
+<p>Now you can build as many models as you like:</p>
+<pre class="r"><code>verTrain &lt;- my3Frames$train
+verQuiz &lt;- my3Frames$quiz
+verTest &lt;- my3Frames$test
+verMod1 &lt;- tree(pitch_type ~ ., data = verTrain,
+                control = tree.control(
+                  nobs = nrow(verTrain),
+                  mincut = 100,
+                  minsize = 200,
+                  mindev = 0.1
+                ))
+summary(verMod1)</code></pre>
+<pre><code>## 
+## Classification tree:
+## tree(formula = pitch_type ~ ., data = verTrain, control = tree.control(nobs = nrow(verTrain), 
+##     mincut = 100, minsize = 200, mindev = 0.1))
+## Variables actually used in tree construction:
+## [1] &quot;speed&quot; &quot;pfx_x&quot;
+## Number of terminal nodes:  4 
+## Residual mean deviance:  0.5243 = 4813 / 9180 
+## Misclassification error rate: 0.1016 = 933 / 9184</code></pre>
+<pre class="r"><code>tryTree(mod = verMod1, testSet = verQuiz, truth = verQuiz$pitch_type)</code></pre>
+<pre><code>## Errors:  309.  Quiz/Test Set Size:  3061.
+## Error Rate is 0.1009.
+## Confusion matrix:
+##           truth
+## prediction   CH   CU   FF   FT   SL
+##         CH  493    0    0   14   13
+##         CU    2  542    0    0  238
+##         FF    3    0 1304    8    0
+##         FT    0    0   31  413    0
+##         SL    0    0    0    0    0</code></pre>
+<p>The first tree we made has only four nodes, and misclassification rate on the quiz data is very high: about 10.16%.</p>
+<p>Let’s make another, very large tree:</p>
+<pre class="r"><code>verMod2 &lt;- tree(pitch_type ~ ., data = verTrain,
+                control = tree.control(
+                  nobs = nrow(verTrain),
+                  mincut = 1,
+                  minsize = 2,
+                  mindev = 0
+                ))
+summary(verMod2)</code></pre>
+<pre><code>## 
+## Classification tree:
+## tree(formula = pitch_type ~ ., data = verTrain, control = tree.control(nobs = nrow(verTrain), 
+##     mincut = 1, minsize = 2, mindev = 0))
+## Number of terminal nodes:  165 
+## Residual mean deviance:  0 = 0 / 9019 
+## Misclassification error rate: 0 = 0 / 9184</code></pre>
+<pre class="r"><code>tryTree(mod = verMod2, testSet = verQuiz, truth = verQuiz$pitch_type)</code></pre>
+<pre><code>## Errors:  79.  Quiz/Test Set Size:  3061.
+## Error Rate is 0.0258.
+## Confusion matrix:
+##           truth
+## prediction   CH   CU   FF   FT   SL
+##         CH  484    0    2    1   12
+##         CU    0  532    0    0    4
+##         FF    4    0 1318   21    0
+##         FT    3    0   15  413    0
+##         SL    7   10    0    0  235</code></pre>
+<p>Model 2 has very many nodes, and although the misclassification rate on its own data is 0%, the rate on the quiz set is about 2.58%. That’s the rate we care about!</p>
+<p>Let’s try a model that is “intermediate” in size:</p>
+<pre class="r"><code>verMod3 &lt;- tree(pitch_type ~ ., data = verTrain,
+                control = tree.control(
+                  nobs = nrow(verTrain),
+                  mincut = 5,
+                  minsize = 10,
+                  mindev = 0.0003
+                ))
+summary(verMod3)</code></pre>
+<pre><code>## 
+## Classification tree:
+## tree(formula = pitch_type ~ ., data = verTrain, control = tree.control(nobs = nrow(verTrain), 
+##     mincut = 5, minsize = 10, mindev = 3e-04))
+## Variables actually used in tree construction:
+## [1] &quot;speed&quot;   &quot;pfx_x&quot;   &quot;strikes&quot; &quot;pz&quot;      &quot;pfx_z&quot;   &quot;px&quot;      &quot;pitches&quot;
+## Number of terminal nodes:  48 
+## Residual mean deviance:  0.07698 = 703.3 / 9136 
+## Misclassification error rate: 0.0159 = 146 / 9184</code></pre>
+<pre class="r"><code>tryTree(mod = verMod3, testSet = verQuiz, truth = verQuiz$pitch_type)</code></pre>
+<pre><code>## Errors:  68.  Quiz/Test Set Size:  3061.
+## Error Rate is 0.0222.
+## Confusion matrix:
+##           truth
+## prediction   CH   CU   FF   FT   SL
+##         CH  490    0    0    2   11
+##         CU    0  533    0    0    3
+##         FF    3    0 1315   15    0
+##         FT    2    0   18  418    0
+##         SL    3    9    2    0  237</code></pre>
+<p>This tree has a lower misclassification rate: about 2.22%.</p>
+<p>And finally, a tree that is rather on the small side:</p>
+<pre class="r"><code>verMod4 &lt;- tree(pitch_type ~ ., data = verTrain,
+                control = tree.control(
+                  nobs = nrow(verTrain),
+                  mincut = 5,
+                  minsize = 10,
+                  mindev = 0.01
+                ))
+summary(verMod4)</code></pre>
+<pre><code>## 
+## Classification tree:
+## tree(formula = pitch_type ~ ., data = verTrain, control = tree.control(nobs = nrow(verTrain), 
+##     mincut = 5, minsize = 10, mindev = 0.01))
+## Variables actually used in tree construction:
+## [1] &quot;speed&quot; &quot;pfx_x&quot; &quot;pfx_z&quot;
+## Number of terminal nodes:  6 
+## Residual mean deviance:  0.2632 = 2416 / 9178 
+## Misclassification error rate: 0.0331 = 304 / 9184</code></pre>
+<pre class="r"><code>tryTree(mod = verMod4, testSet = verQuiz, truth = verQuiz$pitch_type)</code></pre>
+<pre><code>## Errors:  101.  Quiz/Test Set Size:  3061.
+## Error Rate is 0.033.
+## Confusion matrix:
+##           truth
+## prediction   CH   CU   FF   FT   SL
+##         CH  493    0    0   14   13
+##         CU    0  527    0    0   15
+##         FF    3    0 1304    8    0
+##         FT    0    0   31  413    0
+##         SL    2   15    0    0  223</code></pre>
+<p>This last tree has a reasonably low misclassification rate of about 3.3%, but that’s not the lowest rate we have seen. With only six nodes, though, Model 4 is small enough to plot and will be easier for non-technical people to understand.</p>
+<p>Which tree should we go with? That’s a judgment call that depends on the practical context of the problem.</p>
+<p>Let’s say that we decide to go with Model 4. Our last act is to test this model on the test set:</p>
+<pre class="r"><code>tryTree(mod = verMod4, testSet = verTest, truth = verTest$pitch_type)</code></pre>
+<pre><code>## Errors:  104.  Quiz/Test Set Size:  3062.
+## Error Rate is 0.034.
+## Confusion matrix:
+##           truth
+## prediction   CH   CU   FF   FT   SL
+##         CH  503    0    2   11   12
+##         CU    0  526    0    0   18
+##         FF    3    0 1348   11    3
+##         FT    0    0   28  367    0
+##         SL    1   15    0    0  214</code></pre>
+<p>Based on the result, we figure that our chosen model will have about a 3.4% error rate on new but similar observations of Justin Verlander pitches.</p>
+<p><strong>Note: remember to stick with the model you chose! Don’t go back and try another candidate model on your test set!</strong></p>
+</div>
 
 
 

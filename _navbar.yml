@@ -9,15 +9,13 @@ left:
     href:  instructorNotes.html
   - text:  "Vignettes"
     menu:
-      - text:  "Train/Quiz/Test Division"
+      - text:  "Testing Trees"
         href:  divideTrainTest.html
-      - text:  "Trying Out Your Tree"
-        href:  tryTree.html
       - text:  "The Tree Detective"
         href: treeDetective.html
       - text:  "Distribtution at the Nodes"
         href:  distAtNodes.html
-      - text: "Tuning Your Tree"
+      - text: "Tuning Your Tree:  An App"
         href: tuneTree.html
   - text: "Related"
     href:  resources.html
