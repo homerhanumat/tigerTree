@@ -1,0 +1,26 @@
+title: "tigerTree"
+type: inverse
+left:
+  - text: "Home"
+    href: index.html
+  - text: "About"
+    href:  about.html
+  - text:  "For Instructors"
+    href:  instructorNotes.html
+  - text:  "Vignettes"
+    menu:
+      - text:  "Train/Quiz/Test Division"
+        href:  divideTrainTest.html
+      - text:  "Tryin Out Your Tree"
+        href:  tryTree.html
+      - text:  "The Tree Detective"
+        href: treeDetective.html
+      - text:  "Distribtution at the Nodes"
+        href:  distAtNodes.html
+      - text: "Tuning Your Tree"
+        href: tuneTree.html
+  - text: "Related"
+    href:  resources.html
+right:
+  - icon: fa-github fa-lg
+href: https://github.com/homerhanumat/tigerTree
