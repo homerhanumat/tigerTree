@@ -1,6 +1,6 @@
-#' Functions for Working with Trees in MAT 111
+#' Functions for Working with Trees in Elementary Data Analysis
 #'
-#' For use by my elementary statistics students.
+#' For use by elementary students in statistics and data analysis.
 #'
 #' @name tigerTree
 #' @docType package
@@ -13,4 +13,5 @@
 #' @importFrom shiny htmlOutput tableOutput
 #' @importFrom graphics plot text
 #' @importFrom stats predict xtabs
+#' @importFrom plyr mapvalues
 NULL

@@ -171,3 +171,46 @@ numericQuestion <- function(charStr, varName) {
   charStr <- substr(charStr, 2, nchar(charStr))
   return(paste0("Is ", varName, " < ", charStr," (y/n)? "))
 }
+
+
+#' Distribution at Nodes
+#'
+#' Easily find the distribtution of the response variable at each of the
+#' nodes of a classification tree.
+#'
+#' @param mod A tree model constructed by the \code{tree} package.
+#' @param df A data frame (usually the training set, quiz set or test set).
+#' @param resp_varname Yhe name of the response variable, as a character string.
+#'
+#' @return A table object.
+#' @export
+#' @examples
+#' \dontrun{
+#' dfs <- divideTrainTest(seed = 3030, prop.train = 0.67, data = iris)
+#' irisTrain <- dfs$train
+#' irisTest <- dfs$test
+#' tr.mod <- tree(Species ~ ., data = irisTrain)
+#' distAtNodes(tr.mod, df = irisTest, resp_varname = "Species")
+#' }
+distAtNodes <- function(mod, df, resp_varname) {
+  nodes_by_row <- predict(mod, newdata = df, type = "where")
+  nodes_by_num <- plyr::mapvalues(nodes_by_row,
+                                  from = nodeRows(mod),
+                                  to   = nodeNumbers(mod))
+  tempDF <- data.frame(node = nodes_by_num, response = df[, resp_varname])
+  names(tempDF)[2] <- resp_varname
+  tab <- eval(parse(
+    text = paste0("xtabs(~ node + ",resp_varname, ", data = tempDF)")))
+  tab
+}
+
+
+nodeNumbers <- function(mod) {
+  left_splits <- mod$frame$splits[, 1]
+  nodes_lines <- mod$frame[left_splits == "",]
+  as.numeric(row.names(nodes_lines))
+}
+
+nodeRows <- function(mod) {
+  sort(as.numeric(unique(mod$where)))
+}

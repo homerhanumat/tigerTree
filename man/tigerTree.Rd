@@ -4,8 +4,8 @@
 \name{tigerTree}
 \alias{tigerTree}
 \alias{tigerTree-package}
-\title{Functions for Working with Trees in MAT 111}
+\title{Functions for Working with Trees in Elementary Data Analysis}
 \description{
-For use by my elementary statistics students.
+For use by elementary students in statistics and data analysis.
 }
 
