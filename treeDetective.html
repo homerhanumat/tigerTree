@@ -339,7 +339,60 @@ div.tocify {
 </div>
 
 
-<p>TODO</p>
+<p><code>treeDetective()</code> is a simple app that you can show to a fellow students to help him or her understand how a tree works.</p>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<p>Consider the <code>m111survey</code> data frame from the <code>tigerstats</code> package, and say that we constuct a tree to predict the sex of a perosn from the other variables in this data frame:</p>
+<pre class="r"><code>str(m111survey)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    71 obs. of  12 variables:
+##  $ height         : num  76 74 64 62 72 70.8 70 79 59 67 ...
+##  $ ideal_ht       : num  78 76 NA 65 72 NA 72 76 61 67 ...
+##  $ sleep          : num  9.5 7 9 7 8 10 4 6 7 7 ...
+##  $ fastest        : int  119 110 85 100 95 100 85 160 90 90 ...
+##  $ weight_feel    : Factor w/ 3 levels &quot;1_underweight&quot;,..: 1 2 2 1 1 3 2 2 2 3 ...
+##  $ love_first     : Factor w/ 2 levels &quot;no&quot;,&quot;yes&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ extra_life     : Factor w/ 2 levels &quot;no&quot;,&quot;yes&quot;: 2 2 1 1 2 1 2 2 2 1 ...
+##  $ seat           : Factor w/ 3 levels &quot;1_front&quot;,&quot;2_middle&quot;,..: 1 2 2 1 3 1 1 3 3 2 ...
+##  $ GPA            : num  3.56 2.5 3.8 3.5 3.2 3.1 3.68 2.7 2.8 NA ...
+##  $ enough_Sleep   : Factor w/ 2 levels &quot;no&quot;,&quot;yes&quot;: 1 1 1 1 1 2 1 2 1 2 ...
+##  $ sex            : Factor w/ 2 levels &quot;female&quot;,&quot;male&quot;: 2 2 1 1 2 2 2 2 1 1 ...
+##  $ diff.ideal.act.: num  2 2 NA 3 0 NA 2 -3 2 0 ...</code></pre>
+<pre class="r"><code>s2 &lt;- subset(m111survey, complete.cases(m111survey) == TRUE)
+trMod &lt;- tree(sex ~ ., data = s2)
+plot(trMod); text(trMod)</code></pre>
+<p><img src="treeDetective_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="calling-the-detective" class="section level2">
+<h2>Calling the Detective</h2>
+<p>Now we simply call <code>treeDetective()</code>:</p>
+<pre class="r"><code>treeDetective(trMod, data = s2)</code></pre>
+<p>The first argument is the model we made; the <code>data</code> argument should be set to the data frame we used to make this model.</p>
+<p>Now suppose we want to learn what the mode predicts for a person a person whose ideal height is 69 inches and whose GPA is 3.1. As you can see from the plto above, since the ideal height is less than 71 inches we move from the root node to the left. We then come to a node where GPA is the deciding variable. Since the GPA is less than 2.785 we move to the left again, arriving at temrinal node where the majority of observations are females.</p>
+<p>The tree-detective takes the same trip through tree, interactively:</p>
+<pre><code>&gt; treeDetective(trMod, data = s2)
+Is ideal_ht &lt; 71 (y/n)? y
+Is GPA &lt; 2.785 (y/n)? y
+I have reached a leaf with 6 items.
+I predict the value is female.
+The estimated probabilities for each class are:
+   female      male 
+0.6666667 0.3333333 
+     1      0 </code></pre>
+<p>Apparently four of the six individuals at the temrinal node are female and two are male, hence the prediction that this person is female.</p>
+</div>
+<div id="regression-tree-detective" class="section level2">
+<h2>Regression-Tree Detective</h2>
+<p>You can use the app with regression trees, too:</p>
+<pre class="r"><code>trFast &lt;- tree(fastest ~ ., data = s2)
+plot(trFast); text(trFast)</code></pre>
+<p><img src="treeDetective_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Now imagine a person whose ideal height is 73 inches and who prefers to sit in the back. The interaction for this person is as follows:</p>
+<pre><code>&gt; treeDetective(trFast, data = s2)
+Is ideal_ht &lt; 72.5 (y/n)? n
+Is seat one of: 1_front, 2_middle (y/n)? n
+I have reached a leaf with 5 items.
+I predict the value is 136.</code></pre>
+</div>
 
 
 

@@ -7,7 +7,7 @@ output:
 ---
 
 ```{r include=FALSE}
-knitr::opts_chunk$set(tidy=FALSE,fig.width=5.5,fig.height=3.5, cache = TRUE)
+knitr::opts_chunk$set(tidy=FALSE, cache = TRUE)
 library(tigerstats)
 library(tigerTree)
 ```
@@ -65,6 +65,11 @@ plot(trFast); text(trFast)
 Now imagine a person whose ideal height is 73 inches and who prefers to sit in the back.  The interaction for this person is as follows:
 
 ```
+> treeDetective(trFast, data = s2)
+Is ideal_ht < 72.5 (y/n)? n
+Is seat one of: 1_front, 2_middle (y/n)? n
+I have reached a leaf with 5 items.
+I predict the value is 136.
 ```
 
 
