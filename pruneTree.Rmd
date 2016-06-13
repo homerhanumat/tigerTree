@@ -1,0 +1,120 @@
+---
+title: "Pruning a Tree Automatically"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(tidy=FALSE,cache = TRUE)
+library(tigerstats)
+library(tigerTree)
+```
+
+## Introduction
+
+The Shiny app called by the `tuneTree()` function allowed you to create a number of different tree models on a training set and to compare their performance on a quiz set.  You were then free to choose the tree you liked best, and to try the chosen tree on a test set.
+
+But it's time-consuming to poke around, creating trees one-by-one.  Now that we understand the basic idea---tree-performance is a function of tree-size, with trees of "intermediate" size tending to do best---it's time to let the computer create the trees for you.
+
+`prune.tree()` provides one way to do this.
+
+## Setup
+
+Once again we'll work with the `verlander` data from the `tigerstats` package, dividing the data into training, quiz and test sets:
+
+```{r}
+ver2 <- verlander  # from the tigerstats package
+ver2$season <- NULL
+ver2$gamedate <- NULL
+dfs <- divideTrainTest(seed = 3030, prop.train = 0.6, prop.quiz = 0.2, data = ver2)
+verTrain <- dfs$train
+verTest <- dfs$test
+verQuiz <- dfs$quiz
+```
+
+Next we build a large tree, using the training set:
+
+```{r}
+trModbig <- tree(pitch_type ~ ., data = verTrain,
+                 control = tree.control(
+                   nobs = nrow(verTrain),
+                   mincut = 2,
+                   minsize = 4,
+                   mindev = 0.0002
+                 ))
+summary(trModbig)
+```
+
+We get a tree with 96 nodes. 
+
+## Calling `prune.tree()`
+
+Noe we bring in the `prune.tree()` function, and plot the resulting object:
+
+```{r}
+prtrMod <- prune.tree(trModbig, newdata = verQuiz, method = "deviance")
+plot(prtrMod)
+```
+
+`prune.tree()` takes the tree model and snips away nodes one-by-one, creating successively smaller sub-trees.  For each possible number of terminal nodes it uses a sophisticated method to select a "best"" sub-tree having that number of terminal nodes to appear in the plot.  The resulting plot---covering many trees having from 1 to 96 terminal nodes---shows the number of terminal nodes on the bottom horizontal axis and the total deviance of the tree---on the quiz set---on the vertical axis.  (The top horizontal axis gives the value of a "tuning constant" used to find the best tree at each size.  You can ignore this axis if you like.)
+
+It is also possible to measure performance in terms of mis-classifications on the quiz set, as follows:
+
+```{r}
+prtrModmisclass <- prune.tree(trModbig, newdata = verQuiz, method = "misclass")
+plot(prtrModmisclass)
+```
+
+Either way, we get the U-shape that we saw in the `tuneTree()` app.  Keep in mind, though, that the trees aren't built by varying the parameters in `tree.control()`:  instead they are all found by snipping nodes off of the original large tree---pruning the tree, as it were.
+
+## Choosing a "Good" Sub-Tree
+
+Let's say that we decide to measure performance by deviance on the quiz set.  From the plot it appears that the deviance is lowest somewhere around node sizes 15 to 40 or so.
+
+Here's how to get a closer look.  The object `prtrMod` is a list consisting of several components.
+
+```{r}
+str(prtrMod)
+```
+
+`size` and `dev` give horizontal and vertical coordinates of each sub-tree in the plot.  Let's make a data frame for the trees having node sizes from 15 to 40:
+
+```{r}
+size <- prtrMod$size
+mediumSizes <- size[size >= 15 & size <= 40]
+deviations <- prtrMod$dev[size >= 15 & size <= 40]
+df <- data.frame(size = mediumSizes, dev = deviations)
+df
+```
+
+The smallest deviation occurs at 33 nodes, but this seems to be a blip.  We might as well look at 27 nodes, which gives nearly as small a deviation.
+
+Again it's a judgement call, and really all we need is something in the neighborhood.  Let's say that we will aim for the sub-tree having 27 nodes.  Unfortunately we cannot recover it precisely, but we can find another good tree of the same size, using the `best` argument:
+
+```{r}
+bestTree <- prune.tree(trModbig, newdata = verQuiz, best = 27)
+```
+
+The object `bestTree` is a regular tree model.  We can summarize it, for example:
+
+```{r}
+summary(bestTree)
+```
+
+Note that the deviance is 964.1, but that is for the training set, not the quiz set!
+
+
+## Testing Your Tree
+
+Now we have chosen a tree, we should try it out on the test set.
+
+```{r}
+tryTree(bestTree, testSet = verTest, truth = verTest$pitch_type)
+```
+
+
+
+
+

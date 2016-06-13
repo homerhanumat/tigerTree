@@ -19,6 +19,8 @@ left:
         href:  distAtNodes.html
       - text: "Tuning Your Tree:  An App"
         href: tuneTree.html
+      - text: "Tuning Your Tree:  Automated"
+        href: pruneTree.html
   - text: "Related"
     href:  resources.html
 right:
