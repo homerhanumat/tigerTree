@@ -64,7 +64,7 @@ divideTrainTest <- function(seed = NULL, prop.train = 0.6,
 #' @param printOut If TRUE, provide a printout to the console.
 #'
 #' @return  A list,  If \code{md} is a classification tree, then the list
-#' contains elements \code{error.rate} and \code{confusion} (the confucsion matrix).
+#' contains elements \code{error.rate} and \code{confusion} (the confusion matrix).
 #' If \code{md} is a classification tree, then the list
 #' contains elements \code{error.rate} is a regression tree, then the list contains
 #' elements named \code{mse} and \code{rmse} (mean-square error and root mean square
@@ -79,6 +79,10 @@ divideTrainTest <- function(seed = NULL, prop.train = 0.6,
 #' @export
 tryTree <- function(mod, testSet, truth, printOut = TRUE) {
   treeType <- class(mod$y)
+  # exclude observations where value of response variable is missing
+  missingResponse <- is.na(truth)
+  numberMissing <- sum(missingResponse)
+  testSet <- testSet[!missingResponse,]
   if (treeType == "factor") {
     prediction <- predict(mod, newdata = testSet, type = "class")
     wrong <- prediction!= truth
@@ -133,7 +137,7 @@ treeDetective <- function(mod, data, rowname = "1") {
   currentRow <- df[rowname, ]
   status <- currentRow$var
   if (status == "<leaf>") {
-    cat(paste0("I have reached a leaf with ", df[rowname,"n"]," items.\n"))
+    cat(paste0("I have reached a terminal node with ", df[rowname,"n"]," items.\n"))
     msg <- paste0("I predict the value is ", currentRow$yval,".\n")
     cat(msg)
     if (is.factor(currentRow$yval)) {
@@ -147,12 +151,30 @@ treeDetective <- function(mod, data, rowname = "1") {
     var <- get(varName, envir = as.environment(data))
     isFactor <- is.factor(var)
     charStr <- currentRow$splits[,1]
-    answer <- ifelse(isFactor,
-                     readline(prompt = factorQuestion(charStr, varName, data)),
-                     readline(prompt = numericQuestion(charStr, varName)))
-    answer <- substr(answer, 1,1)
     rn <- as.numeric(rowname)
-    newRowName <- ifelse(answer %in% c("y","Y"), 2*rn, 2*rn + 1)
+    answer <- NULL
+    while ( is.null(answer) ) {
+      answer <- ifelse(isFactor,
+                       readline(prompt = factorQuestion(charStr, varName, data)),
+                       readline(prompt = numericQuestion(charStr, varName)))
+      answer <- tolower(substr(answer, 1,1))
+      if (!(answer %in% c("y","n","d"))) {
+        cat("Sorry, I did not understand that.  Try again.")
+        answer <- NULL
+      }
+    }
+    if ( answer == "d") {
+      cat(paste0("OK, we are stuck at a node with ", df[rowname,"n"]," items.\n"))
+      msg <- paste0("I predict the value is ", currentRow$yval,".\n")
+      cat(msg)
+      if (is.factor(currentRow$yval)) {
+        msg2 <- paste0("The estimated probabilities for each class are:\n")
+        cat(msg2)
+        print(yprobs[rowname,], row.names = FALSE)
+        return(invisible())
+      }
+    }
+    newRowName <- ifelse(answer == "y", 2*rn, 2*rn + 1)
     treeDetective(mod, data, as.character(newRowName))
   }
 }
@@ -165,13 +187,13 @@ factorQuestion <- function(charStr, varName, data) {
   var <- get(varName, envir = as.environment(data))
   varLevels <- levels(var)[levelNumbers]
   joinedLevels <- paste0(varLevels, collapse = ", ")
-  return(paste0("Is ", varName, " one of: ", joinedLevels," (y/n)? "))
+  return(paste0("Is ", varName, " one of: ", joinedLevels," (y/n/dunno)? "))
 }
 
 numericQuestion <- function(charStr, varName) {
   # strip leading <
   charStr <- substr(charStr, 2, nchar(charStr))
-  return(paste0("Is ", varName, " < ", charStr," (y/n)? "))
+  return(paste0("Is ", varName, " < ", charStr," (y/n/dunno)? "))
 }
 
 
