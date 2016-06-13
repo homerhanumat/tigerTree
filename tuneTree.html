@@ -11,7 +11,7 @@
 
 
 
-<title>Tuning Your Tree</title>
+<title>Tuning Your Tree Interactively</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
@@ -334,12 +334,63 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Tuning Your Tree</h1>
+<h1 class="title toc-ignore">Tuning Your Tree Interactively</h1>
 
 </div>
 
 
-<p>TODO</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The Shiny app called by the <code>tuneTree()</code> function allows the use to create quickly a number of different tree models and to compare their performance, leaving with the code for those models which he or she finds most interesting.</p>
+<p>The app is intended to act as a bridge between naive construction of a single tree model on the one hand and automated tree-pruning functions—provided by the various machine-learning packages—on the other.</p>
+</div>
+<div id="syntax" class="section level2">
+<h2>Syntax</h2>
+<p>One is most likely to use the app when one has divided the data into training, quiz and test sets, for example:</p>
+<pre class="r"><code>ver2 &lt;- verlander  # from the tigerstats package
+ver2$season &lt;- NULL
+ver2$gamedate &lt;- NULL
+dfs &lt;- divideTrainTest(seed = 3030, prop.train = 0.6, prop.quiz = 0.2, data = ver2)
+verTrain &lt;- dfs$train
+verTest &lt;- dfs$test
+verQuiz &lt;- dfs$quiz</code></pre>
+<p>We now call the app:</p>
+<pre class="r"><code>tuneTree(pitch_type ~ ., data = ver2, 
+         testSet = verQuiz, 
+         truth = verQuiz$pitch_type)</code></pre>
+<p>The first two arguments are the same as those used to build a tree model from a data frame. Note that the models will be built with the training set.</p>
+<p>The <code>testSet</code> argument should be set to the quiz set, since one is making multiple models in order to compare them.</p>
+<p>The <code>truth</code> argument identifies the variable in the quiz set that gives the “correct answer” for each observation.</p>
+</div>
+<div id="sidebar" class="section level2">
+<h2>Sidebar</h2>
+<p>The sidebar contains input widgets that allow the user to set the <code>tree.control()</code> parameters <code>mincut</code>, <code>minsize</code> and <code>mindev</code>, as well as an action button to make the tree model that corresponds to the user’s selections.</p>
+</div>
+<div id="tabs" class="section level2">
+<h2>Tabs</h2>
+<p>The app has four tabs.</p>
+<div id="plot-tab" class="section level3">
+<h3>Plot Tab</h3>
+<p>The first tab shows an annotated plot of the most recent tree model.</p>
+</div>
+<div id="summarytry-tab" class="section level3">
+<h3>Summary/Try Tab</h3>
+<p>In this tab we see the results of “trying out” the most recent model on the quiz set. We are given a summary of the model. If the model is a classification tree then we also get the confusion matrix. If it’s a regression tree then we get a statement of the root mean square error.</p>
+</div>
+<div id="performance-vs.size-tab" class="section level3">
+<h3>Performance vs. Size Tab</h3>
+<p>This tab shows a plot of all models created so far. On the horizontal axis is the number of terminal nodes in the model. The vertical axis gives a measure of how well the model performed on the quiz set: either the mis-classification rate if we are working with classification trees or the root mean square error if we are looking at regression trees.</p>
+<p>When we have made lots of models the graph should begin to assume a U-shape. (Models of an “intermediate” size tend to excel at handling the bias-variance trade-off.)</p>
+</div>
+<div id="modelscode-tab" class="section level3">
+<h3>Models/Code Tab</h3>
+<p>On the final tab we get a list of all models created so far. We can sort the list by some useful measure, such as number of nodes or mis-classification rate. We can use the mouse to select any number of rows; the code to create the corresponding model(s) will appear near the top of the tab. We can copy and paste this code into any document we like, in order to keep a record the most interesting models.</p>
+</div>
+</div>
+<div id="afterwards" class="section level2">
+<h2>Afterwards</h2>
+<p>Remember: once you have chosen your model, try it out on the test set!</p>
+</div>
 
 
 

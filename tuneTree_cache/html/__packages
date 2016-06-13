@@ -1,0 +1,13 @@
+base
+nlme
+lattice
+dplyr
+ggplot2
+car
+mosaicData
+mosaic
+abd
+tigerstats
+tree
+tigerTree
+shiny

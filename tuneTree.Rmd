@@ -1,5 +1,5 @@
 ---
-title: "Tuning Your Tree"
+title: "Tuning Your Tree Interactively"
 output:
   html_document:
     toc: yes
@@ -7,9 +7,75 @@ output:
 ---
 
 ```{r include=FALSE}
-knitr::opts_chunk$set(tidy=FALSE,fig.width=5.5,fig.height=3.5, cache = TRUE)
+knitr::opts_chunk$set(tidy=FALSE,cache = TRUE)
 library(tigerstats)
 library(tigerTree)
 ```
 
-TODO
+## Introduction
+
+The Shiny app called by the `tuneTree()` function allows the use to create quickly a number of different tree models and to compare their performance, leaving with the code for those models which he or she finds most interesting.
+
+The app is intended to act as a bridge between naive construction of a single tree model on the one hand and automated tree-pruning functions---provided by the various machine-learning packages---on the other.
+
+## Syntax
+
+One is most likely to use the app when one has divided the data into training, quiz and test sets, for example:
+
+```{r}
+ver2 <- verlander  # from the tigerstats package
+ver2$season <- NULL
+ver2$gamedate <- NULL
+dfs <- divideTrainTest(seed = 3030, prop.train = 0.6, prop.quiz = 0.2, data = ver2)
+verTrain <- dfs$train
+verTest <- dfs$test
+verQuiz <- dfs$quiz
+```
+
+We now call the app:
+
+```{r eval = FALSE}
+tuneTree(pitch_type ~ ., data = ver2, 
+         testSet = verQuiz, 
+         truth = verQuiz$pitch_type)
+```
+
+The first two arguments are the same as those used to build a tree model from a data frame.  Note that the models will be built with the training set.
+
+The `testSet` argument should be set to the quiz set, since one is making multiple models in order to compare them.
+
+The `truth` argument identifies the variable in the quiz set that gives the "correct answer" for each observation.
+
+## Sidebar
+
+The sidebar contains input widgets that allow the user to set the `tree.control()` parameters `mincut`, `minsize` and `mindev`, as well as an action button to make the tree model that corresponds to the user's selections.
+
+## Tabs
+
+The app has four tabs.
+
+### Plot Tab
+
+The first tab shows an annotated plot of the most recent tree model.
+
+### Summary/Try Tab
+
+In this tab we see the results of "trying out" the most recent model on the quiz set.  We are given a summary of the model.  If the model is a classification tree then we also get the confusion matrix.  If it's a regression tree then we get a statement of the root mean square error.
+
+### Performance vs. Size Tab
+
+This tab shows a plot of all models created so far.  On the horizontal axis is the number of terminal nodes in the model.  The vertical axis gives a measure of how well the model performed on the quiz set:  either the mis-classification rate if we are working with classification trees or the root mean square error if we are looking at regression trees.
+
+When we have made lots of models the graph should begin to assume a U-shape.  (Models of an "intermediate" size tend to excel at handling the bias-variance trade-off.)
+
+### Models/Code Tab
+
+On the final tab we get a list of all models created so far.  We can sort the list by some useful measure, such as number of nodes or mis-classification rate.  We can use the mouse to select any number of rows; the code to create the corresponding model(s) will appear near the top of the tab.  We can copy and paste this code into any document we like, in order to keep a record the most interesting models.
+
+## Afterwards
+
+Remember:  once you have chosen your model, try it out on the test set!
+
+
+
+
