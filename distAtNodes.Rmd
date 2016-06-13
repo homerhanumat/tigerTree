@@ -43,7 +43,7 @@ trMod
 
 We can tell that pitches at terminal nodes 10 and 23 are especially likely to be curve balls.
 
-## Distribution at the Nodes:  Taining Set
+## Distribution at the Nodes:  Training Set
 
 The `distAtNodes()` function gives us this information directly, in the form of a table:
 
@@ -53,7 +53,7 @@ trainTab
 rowPerc(trainTab)
 ```
 
-## Distribution at the Nodes:  Taining Set
+## Distribution at the Nodes:  Training Set
 
 The model points to two nodes as having "high-likelihood nodes" for curve-balls.  But a more reliable estimate of the probability of a curve-ball at each of these nodes  is provided by applying the model to *new* data, not the data that is used to build the model itself.  Hence we also use the `distAtNodes()` function on the model and the *test* set:
 
@@ -65,9 +65,26 @@ rowPerc(testTab)
 
 Again nodes 10 and 23 stand out---and with about the same probability of curve-ball at each node.
 
-## Caution
+## Cautions
+
+### Variability
 
 When a node does not contain a large number of individuals, estimates of distribution of the response variable at that node are subject to a great deal of chance variation.  Watch for this especially when you are building trees with many nodes, or when your training or test sets are not large to being with. 
+
+### Missing Values
+
+We are interested here in the distribution of individuals at *terminal nodes only*.  However, when an observation is missing the value of a variable and the tree requires that value at some node, then the tree will stop at that node and make a prediction based upon all observations that pass through that node.  In order to prevent non-terminal nodes from showing up in your analysis, you should remove all obervations with missing values.  
+
+One way to accomplsh this is with the `complete.cases()` function. Supppose, for example, that we wish to work with `m111survey` from the `tigerstats` package.  It so happens that three of the rows in the data frame contains at least one missing value.  Create a new copy that removes them:
+
+```{r}
+s2 <- subset(m111survey, complete.cases(m111survey) == TRUE)
+nrow(m111survey)
+nrow(s2)
+```
+
+
+Sure enough, the three offending obervations were removed.
 
 
 

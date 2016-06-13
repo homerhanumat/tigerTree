@@ -360,17 +360,10 @@ str(m111survey)</code></pre>
 ##  $ enough_Sleep   : Factor w/ 2 levels &quot;no&quot;,&quot;yes&quot;: 1 1 1 1 1 2 1 2 1 2 ...
 ##  $ sex            : Factor w/ 2 levels &quot;female&quot;,&quot;male&quot;: 2 2 1 1 2 2 2 2 1 1 ...
 ##  $ diff.ideal.act.: num  2 2 NA 3 0 NA 2 -3 2 0 ...</code></pre>
-<div id="preparing-the-data" class="section level3">
-<h3>Preparing the Data</h3>
-<p><code>tree()</code> likes to work factor or numerical variables (or both), and it complains when there is missing data. If you’ve got <code>NA</code> values in your data, consider removing them all:</p>
-<pre class="r"><code>s2 &lt;- subset(m111survey, complete.cases(m111survey) == T)
-nrow(s2)  # the previous operation removed three rows</code></pre>
-<pre><code>## [1] 68</code></pre>
-</div>
 <div id="a-classification-tree" class="section level3">
 <h3>A Classification Tree</h3>
 <p>Suppose we intend to use our data to construct a tree that predicts the sex of a person based upon where a person prefers to sit, fastest speed he/she has ever driven, and the high-school GPA. We can construct such a model as follows:</p>
-<pre class="r"><code>trMod &lt;- tree(sex ~ seat + fastest + GPA, data = s2)</code></pre>
+<pre class="r"><code>trMod &lt;- tree(sex ~ seat + fastest + GPA, data = m111survey)</code></pre>
 </div>
 <div id="ways-to-view-your-tree" class="section level3">
 <h3>Ways to View Your Tree</h3>
@@ -381,17 +374,17 @@ nrow(s2)  # the previous operation removed three rows</code></pre>
 <pre><code>## node), split, n, deviance, yval, (yprob)
 ##       * denotes terminal node
 ## 
-##  1) root 68 93.320 female ( 0.55882 0.44118 )  
-##    2) GPA &lt; 3.1335 25 31.340 male ( 0.32000 0.68000 )  
-##      4) seat: 1_front,3_back 13 17.940 female ( 0.53846 0.46154 ) *
+##  1) root 70 96.120 female ( 0.55714 0.44286 )  
+##    2) GPA &lt; 3.1335 26 32.100 male ( 0.30769 0.69231 )  
+##      4) seat: 1_front,3_back 14 19.410 male ( 0.50000 0.50000 ) *
 ##      5) seat: 2_middle 12  6.884 male ( 0.08333 0.91667 )  
 ##       10) GPA &lt; 2.6 5  5.004 male ( 0.20000 0.80000 ) *
 ##       11) GPA &gt; 2.6 7  0.000 male ( 0.00000 1.00000 ) *
-##    3) GPA &gt; 3.1335 43 52.700 female ( 0.69767 0.30233 )  
-##      6) fastest &lt; 106.5 27 25.870 female ( 0.81481 0.18519 )  
+##    3) GPA &gt; 3.1335 44 53.410 female ( 0.70455 0.29545 )  
+##      6) fastest &lt; 106.5 28 26.280 female ( 0.82143 0.17857 )  
 ##       12) GPA &lt; 3.715 21 23.050 female ( 0.76190 0.23810 ) *
-##       13) GPA &gt; 3.715 6  0.000 female ( 1.00000 0.00000 ) *
-##      7) fastest &gt; 106.5 16 22.180 female ( 0.50000 0.50000 )  
+##       13) GPA &gt; 3.715 7  0.000 female ( 1.00000 0.00000 ) *
+##      7) fastest &gt; 106.5 16 22.180 male ( 0.50000 0.50000 )  
 ##       14) seat: 1_front 8 10.590 female ( 0.62500 0.37500 ) *
 ##       15) seat: 2_middle,3_back 8 10.590 male ( 0.37500 0.62500 ) *</code></pre>
 </div>
@@ -401,17 +394,17 @@ nrow(s2)  # the previous operation removed three rows</code></pre>
 <pre class="r"><code>summary(trMod)</code></pre>
 <pre><code>## 
 ## Classification tree:
-## tree(formula = sex ~ seat + fastest + GPA, data = s2)
+## tree(formula = sex ~ seat + fastest + GPA, data = m111survey)
 ## Number of terminal nodes:  7 
-## Residual mean deviance:  1.101 = 67.17 / 61 
-## Misclassification error rate: 0.2647 = 18 / 68</code></pre>
+## Residual mean deviance:  1.089 = 68.63 / 63 
+## Misclassification error rate: 0.2714 = 19 / 70</code></pre>
 </div>
 <div id="plot" class="section level4">
 <h4>Plot</h4>
 <p>For a plot with textual annotations:</p>
 <pre class="r"><code>plot(trMod)  # draws the branches
 text(trMod)  # adds the annotation</code></pre>
-<p><img src="growTree_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="growTree_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>Note that splits involving the factor variable <strong>seat</strong> are coded by letter of the alphabet, in order of the levels of the factor variable:</p>
 <ul>
 <li>“1_front” is a;</li>
@@ -424,20 +417,20 @@ text(trMod)  # adds the annotation</code></pre>
 <div id="a-regression-tree" class="section level3">
 <h3>A Regression Tree</h3>
 <p>When the response variable is numeric then we are making <em>regression</em> trees. The syntax is just the same as for classification trees. For example, to predict fastest speed every driven from sex, seat, height and GPA, then use:</p>
-<pre class="r"><code>trFast &lt;- tree(fastest ~ sex + seat + height + GPA, data = s2)</code></pre>
+<pre class="r"><code>trFast &lt;- tree(fastest ~ sex + seat + height + GPA, data = m111survey)</code></pre>
 <p>Viewing works just the same way as for classification trees, for example:</p>
 <pre class="r"><code>plot(trFast); text(trFast)</code></pre>
-<p><img src="growTree_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="growTree_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>
 <div id="using-all-other-variables-as-predictors" class="section level3">
 <h3>Using “All Other” variables as Predictors</h3>
 <p>If all variables in the data other than the response variable could be used as predictors, then we don’t have to type them all in: instead we just type a <code>.</code> after the <code>~</code> in the formula, thus:</p>
-<pre class="r"><code>trModAllVars &lt;- tree(sex~ ., data = s2)</code></pre>
+<pre class="r"><code>trModAllVars &lt;- tree(sex~ ., data = m111survey)</code></pre>
 <p>This model predicts sex on the basis of <em>every other</em> variable in the data frame.</p>
 </div>
 <div id="eliminating-spurious-variables" class="section level3">
 <h3>Eliminating Spurious Variables</h3>
-<p>trees Work with factor and numerical variables, but variables such as dates or addresses may not fall meaningfully under either category. If you want the convenience of the <code>.</code> notation, then those spurious variables need to be removed first.</p>
+<p>Trees work with factor and numerical variables, but variables such as dates or addresses may not fall meaningfully under either category. If you want the convenience of the <code>.</code> notation, then those spurious variables need to be removed first.</p>
 <p>Consider, for example, the <code>verlander</code> data frame from the <code>tigerstats</code> package:</p>
 <pre class="r"><code>help(verlander)
 str(verlander)</code></pre>
@@ -479,9 +472,9 @@ ver2$gamedate &lt;- NULL</code></pre>
 <div id="controlling-tree-growth" class="section level2">
 <h2>Controlling Tree Growth</h2>
 <p>We can control the size of the tree with the <code>tree.control()</code> function. Here is an example of its use:</p>
-<pre class="r"><code>trMod2 &lt;- tree(sex ~ ., data = s2,
+<pre class="r"><code>trMod2 &lt;- tree(sex ~ ., data = m111survey,
                control = tree.control(
-                 nobs = nrow(s2),
+                 nobs = nrow(m111survey),
                  mincut = 2,
                  minsize = 4,
                  mindev = 0.001
@@ -526,11 +519,11 @@ ver2$gamedate &lt;- NULL</code></pre>
 ## 
 ## $nobs
 ## [1] 68</code></pre>
-<p>The item <code>nmax</code> gives an estimate of the largest number of nodes that might occur when we construct a tree under the conditions given by <code>nobs</code>, <code>mincut</code>, minsize<code>and</code>mindev<code>.  Here, the largest possible tree would have about 91 nodes.  In practice the number of nodes usually will be much less.  For example,</code>trMod2` constructed with the above parameters has only five nodes:</p>
+<p>The item <code>nmax</code> gives an estimate of the largest number of nodes that might occur when we construct a tree under the conditions given by <code>nobs</code>, <code>mincut</code>, <code>minsize</code> and <code>mindev</code>. Here, the largest possible tree would have about 91 nodes. In practice the number of nodes usually will be much less. For example, <code>trMod2</code> constructed with the above parameters has only five nodes:</p>
 <pre class="r"><code>summary(trMod2)</code></pre>
 <pre><code>## 
 ## Classification tree:
-## tree(formula = sex ~ ., data = s2, control = tree.control(nobs = nrow(s2), 
+## tree(formula = sex ~ ., data = m111survey, control = tree.control(nobs = nrow(m111survey), 
 ##     mincut = 2, minsize = 4, mindev = 0.001))
 ## Variables actually used in tree construction:
 ## [1] &quot;ideal_ht&quot; &quot;GPA&quot;      &quot;height&quot;  
@@ -546,11 +539,11 @@ ver2$gamedate &lt;- NULL</code></pre>
 <div id="the-default-tree" class="section level3">
 <h3>The Default Tree</h3>
 <p>The default values of <code>minuct</code>, minsize<code>and</code>mindev<code>are 5, 10  and 0.01 respectively.  Thus the tree obtained without recourse to</code>tree.control()`:</p>
-<pre class="r"><code>trSex &lt;- tree(sex ~ ., data = s2)</code></pre>
+<pre class="r"><code>trSex &lt;- tree(sex ~ ., data = m111survey)</code></pre>
 <p>is the same as the tree produced by</p>
-<pre class="r"><code>trSex &lt;- tree(sex ~ ., data = s2,
+<pre class="r"><code>trSex &lt;- tree(sex ~ ., data = m111survey,
               control = tree.control(
-                nobs = nrow(s2),
+                nobs = nrow(m111survey),
                 mincut = 2,
                 minsize = 4,
                 mindev = 0.01

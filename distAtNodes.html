@@ -373,8 +373,8 @@ trMod</code></pre>
 ##      7) pfx_x &gt; -8.365 3354   473.00 FF ( 0.0008945 0.0000000 0.9874776 0.0116279 0.0000000 ) *</code></pre>
 <p>We can tell that pitches at terminal nodes 10 and 23 are especially likely to be curve balls.</p>
 </div>
-<div id="distribution-at-the-nodes-taining-set" class="section level2">
-<h2>Distribution at the Nodes: Taining Set</h2>
+<div id="distribution-at-the-nodes-training-set" class="section level2">
+<h2>Distribution at the Nodes: Training Set</h2>
 <p>The <code>distAtNodes()</code> function gives us this information directly, in the form of a table:</p>
 <pre class="r"><code>trainTab &lt;- distAtNodes(trMod, df = verTrain, resp_varname = &quot;pitch_type&quot;)
 trainTab</code></pre>
@@ -396,8 +396,8 @@ trainTab</code></pre>
 ##   22   0.36   0.36   0.00   0.00  99.28 100.00
 ##   23   0.00  63.22   0.00   0.00  36.78 100.00</code></pre>
 </div>
-<div id="distribution-at-the-nodes-taining-set-1" class="section level2">
-<h2>Distribution at the Nodes: Taining Set</h2>
+<div id="distribution-at-the-nodes-training-set-1" class="section level2">
+<h2>Distribution at the Nodes: Training Set</h2>
 <p>The model points to two nodes as having “high-likelihood nodes” for curve-balls. But a more reliable estimate of the probability of a curve-ball at each of these nodes is provided by applying the model to <em>new</em> data, not the data that is used to build the model itself. Hence we also use the <code>distAtNodes()</code> function on the model and the <em>test</em> set:</p>
 <pre class="r"><code>testTab &lt;- distAtNodes(trMod, df = verTest, resp_varname = &quot;pitch_type&quot;)
 testTab</code></pre>
@@ -420,9 +420,23 @@ testTab</code></pre>
 ##   23   0.00  69.32   0.00   0.00  30.68 100.00</code></pre>
 <p>Again nodes 10 and 23 stand out—and with about the same probability of curve-ball at each node.</p>
 </div>
-<div id="caution" class="section level2">
-<h2>Caution</h2>
+<div id="cautions" class="section level2">
+<h2>Cautions</h2>
+<div id="variability" class="section level3">
+<h3>Variability</h3>
 <p>When a node does not contain a large number of individuals, estimates of distribution of the response variable at that node are subject to a great deal of chance variation. Watch for this especially when you are building trees with many nodes, or when your training or test sets are not large to being with.</p>
+</div>
+<div id="missing-values" class="section level3">
+<h3>Missing Values</h3>
+<p>We are interested here in the distribution of individuals at <em>terminal nodes only</em>. However, when an observation is missing the value of a variable and the tree requires that value at some node, then the tree will stop at that node and make a prediction based upon all observations that pass through that node. In order to prevent non-terminal nodes from showing up in your analysis, you should remove all obervations with missing values.</p>
+<p>One way to accomplsh this is with the <code>complete.cases()</code> function. Supppose, for example, that we wish to work with <code>m111survey</code> from the <code>tigerstats</code> package. It so happens that three of the rows in the data frame contains at least one missing value. Create a new copy that removes them:</p>
+<pre class="r"><code>s2 &lt;- subset(m111survey, complete.cases(m111survey) == TRUE)
+nrow(m111survey)</code></pre>
+<pre><code>## [1] 71</code></pre>
+<pre class="r"><code>nrow(s2)</code></pre>
+<pre><code>## [1] 68</code></pre>
+<p>Sure enough, the three offending obervations were removed.</p>
+</div>
 </div>
 
 

@@ -25,21 +25,13 @@ str(m111survey)
 str(m111survey)
 ```
 
-### Preparing the Data
-
-`tree()` likes to work factor or numerical variables (or both), and it complains when there is missing data.  If you've got `NA` values in your data, consider removing them all:
-
-```{r}
-s2 <- subset(m111survey, complete.cases(m111survey) == T)
-nrow(s2)  # the previous operation removed three rows
-```
-
 ### A Classification Tree
+
 
 Suppose we intend to use our data to construct a tree that predicts the sex of a person based upon where a person prefers to sit, fastest speed he/she has ever driven, and the high-school GPA.  We can construct such a model as follows:
 
 ```{r}
-trMod <- tree(sex ~ seat + fastest + GPA, data = s2)
+trMod <- tree(sex ~ seat + fastest + GPA, data = m111survey)
 ```
 
 ### Ways to View Your Tree
@@ -82,7 +74,7 @@ The letters shown at a given node indicate the left-hand split.  Thus the node a
 When the response variable is numeric then we are making *regression* trees.  The syntax is just the same as for classification trees.  For example, to predict fastest speed every driven from sex, seat, height and GPA, then use:
 
 ```{r}
-trFast <- tree(fastest ~ sex + seat + height + GPA, data = s2)
+trFast <- tree(fastest ~ sex + seat + height + GPA, data = m111survey)
 ```
 
 Viewing works just the same way as for classification trees, for example:
@@ -96,14 +88,14 @@ plot(trFast); text(trFast)
 If all variables in the data other than the response variable could be used as predictors, then we don't have to type them all in:  instead we just type a `.` after the `~` in the formula, thus:
 
 ```{r}
-trModAllVars <- tree(sex~ ., data = s2)
+trModAllVars <- tree(sex~ ., data = m111survey)
 ```
 
 This model predicts sex on the basis of *every other* variable in the data frame.
 
 ### Eliminating Spurious Variables
 
-trees Work with factor and numerical variables, but variables such as dates or addresses may not fall meaningfully under either category.  If you want the convenience of the `.` notation, then those spurious variables need to be removed first.
+Trees work with factor and numerical variables, but variables such as dates or addresses may not fall meaningfully under either category.  If you want the convenience of the `.` notation, then those spurious variables need to be removed first.
 
 Consider, for example, the `verlander` data frame from the `tigerstats` package:
 
@@ -144,9 +136,9 @@ verMod <- tree(pitch_type ~ ., data = ver2)
 We can control the size of the tree with the `tree.control()` function.  Here is an example of its use:
 
 ```{r}
-trMod2 <- tree(sex ~ ., data = s2,
+trMod2 <- tree(sex ~ ., data = m111survey,
                control = tree.control(
-                 nobs = nrow(s2),
+                 nobs = nrow(m111survey),
                  mincut = 2,
                  minsize = 4,
                  mindev = 0.001
@@ -186,7 +178,7 @@ tree.control(nobs = 68,
             mindev = 0.001)
 ```
 
-The item `nmax` gives an estimate of the largest number of nodes that might occur when we construct a tree under the conditions given by `nobs`, `mincut`, minsize` and `mindev`.  Here, the largest possible tree would have about 91 nodes.  In practice the number of nodes usually will be much less.  For example, `trMod2` constructed with the above parameters has only five nodes:
+The item `nmax` gives an estimate of the largest number of nodes that might occur when we construct a tree under the conditions given by `nobs`, `mincut`, `minsize` and `mindev`.  Here, the largest possible tree would have about 91 nodes.  In practice the number of nodes usually will be much less.  For example, `trMod2` constructed with the above parameters has only five nodes:
 
 ```{r}
 summary(trMod2)
@@ -203,15 +195,15 @@ As a rule, the lower you set `mincut`, `minsize` and `mindev`, the more nodes yo
 The default values of `minuct`, minsize` and `mindev` are 5, 10  and 0.01 respectively.  Thus the tree obtained without recourse to `tree.control()`:
 
 ```{r eval = F}
-trSex <- tree(sex ~ ., data = s2)
+trSex <- tree(sex ~ ., data = m111survey)
 ```
 
 is the same as the tree produced by
 
 ```{r eval = F}
-trSex <- tree(sex ~ ., data = s2,
+trSex <- tree(sex ~ ., data = m111survey,
               control = tree.control(
-                nobs = nrow(s2),
+                nobs = nrow(m111survey),
                 mincut = 2,
                 minsize = 4,
                 mindev = 0.01

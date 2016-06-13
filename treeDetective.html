@@ -360,28 +360,38 @@ div.tocify {
 ##  $ enough_Sleep   : Factor w/ 2 levels &quot;no&quot;,&quot;yes&quot;: 1 1 1 1 1 2 1 2 1 2 ...
 ##  $ sex            : Factor w/ 2 levels &quot;female&quot;,&quot;male&quot;: 2 2 1 1 2 2 2 2 1 1 ...
 ##  $ diff.ideal.act.: num  2 2 NA 3 0 NA 2 -3 2 0 ...</code></pre>
-<pre class="r"><code>s2 &lt;- subset(m111survey, complete.cases(m111survey) == TRUE)
-trMod &lt;- tree(sex ~ ., data = s2)
+<pre class="r"><code>trMod &lt;- tree(sex ~ ., data = m111survey)
 plot(trMod); text(trMod)</code></pre>
 <p><img src="treeDetective_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 </div>
 <div id="calling-the-detective" class="section level2">
 <h2>Calling the Detective</h2>
 <p>Now we simply call <code>treeDetective()</code>:</p>
-<pre class="r"><code>treeDetective(trMod, data = s2)</code></pre>
+<pre class="r"><code>treeDetective(trMod, data = m111survey)</code></pre>
 <p>The first argument is the model we made; the <code>data</code> argument should be set to the data frame we used to make this model.</p>
 <p>Now suppose we want to learn what the mode predicts for a person a person whose ideal height is 69 inches and whose GPA is 3.1. As you can see from the plot above, since the ideal height is less than 71 inches we move from the root node to the left. We then come to a node where GPA is the deciding variable. Since the GPA is less than 2.785 we move to the left again, arriving at terminal node where the majority of observations are females.</p>
 <p>The tree-detective takes the same trip through tree, interactively:</p>
-<pre><code>&gt; treeDetective(trMod, data = s2)
-Is ideal_ht &lt; 71 (y/n)? y
-Is GPA &lt; 2.785 (y/n)? y
-I have reached a leaf with 6 items.
+<pre><code>&gt; treeDetective(trMod, data = m111survey)
+Is ideal_ht &lt; 71 (y/n/dunno)? y
+Is GPA &lt; 2.785 (y/n/dunno)? n
+I have reached a terminal node with 33 items.
 I predict the value is female.
 The estimated probabilities for each class are:
-   female      male 
-0.6666667 0.3333333 
+female   male 
      1      0 </code></pre>
 <p>Apparently four of the six individuals at the terminal node are female and two are male, hence the prediction that this person is female.</p>
+</div>
+<div id="missing-values" class="section level2">
+<h2>Missing Values</h2>
+<p>When you are queried about a variable but don’t know its value, then you can’t move past the current node of the tree. The predcition from the tree model will be based on the observations at the node on which you are stuck.</p>
+<pre><code>&gt; treeDetective(trMod, data = m111survey)
+Is ideal_ht &lt; 71 (y/n/dunno)? n
+Is fastest &lt; 92.5 (y/n/dunno)? dunno
+OK, we are stuck at a node with 29 items.
+I predict the value is male.
+The estimated probabilities for each class are:
+    female       male 
+0.03448276 0.96551724 </code></pre>
 </div>
 <div id="regression-tree-detective" class="section level2">
 <h2>Regression-Tree Detective</h2>
@@ -391,9 +401,9 @@ plot(trFast); text(trFast)</code></pre>
 <p><img src="treeDetective_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>Now imagine a person whose ideal height is 73 inches and who prefers to sit in the back. The interaction for this person is as follows:</p>
 <pre><code>&gt; treeDetective(trFast, data = s2)
-Is ideal_ht &lt; 72.5 (y/n)? n
-Is seat one of: 1_front, 2_middle (y/n)? n
-I have reached a leaf with 5 items.
+Is ideal_ht &lt; 72.5 (y/n/dunno)? n
+Is seat one of: 1_front, 2_middle (y/n/dunno)? n
+I have reached a terminal node with 5 items.
 I predict the value is 136.</code></pre>
 </div>
 
