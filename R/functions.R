@@ -83,15 +83,20 @@ tryTree <- function(mod, testSet, truth, printOut = TRUE) {
   missingResponse <- is.na(truth)
   numberMissing <- sum(missingResponse)
   testSet <- testSet[!missingResponse,]
+  truth <- truth[!missingResponse]
   if (treeType == "factor") {
     prediction <- predict(mod, newdata = testSet, type = "class")
-    wrong <- prediction!= truth
+    wrong <- prediction != truth
     error.rate <- mean(wrong)
     numberWrong <- sum(wrong)
     testSize <- nrow(testSet)
-    tab <- xtabs(~prediction + truth)
+    tab <- xtabs(~ prediction + truth)
     if (printOut) {
       cat(paste0("Errors:  ", numberWrong,".  Quiz/Test Set Size:  ", testSize, ".\n"))
+      if ( numberMissing > 0) {
+        cat(paste0("(",numberMissing," observations were missing the response",
+                    " variable.\nThey were removed from the quiz/test set.)\n"))
+      }
       cat(paste0("Error Rate is ", round(error.rate,4),".\n"))
       cat("Confusion matrix:\n")
       print(tab)
