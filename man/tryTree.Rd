@@ -17,7 +17,7 @@ tryTree(mod, testSet, truth, printOut = TRUE)
 }
 \value{
 A list,  If \code{md} is a classification tree, then the list
-contains elements \code{error.rate} and \code{confusion} (the confucsion matrix).
+contains elements \code{error.rate} and \code{confusion} (the confusion matrix).
 If \code{md} is a classification tree, then the list
 contains elements \code{error.rate} is a regression tree, then the list contains
 elements named \code{mse} and \code{rmse} (mean-square error and root mean square
@@ -25,6 +25,10 @@ error).
 }
 \description{
 Predict with a Tree
+}
+\note{
+For more details on use, consult
+\url{http://statistics.rainandrhino.org/tigerTree/divideTrainTest.html}
 }
 \examples{
 dfs <- divideTrainTest(seed = 3030, prop.train = 0.67, data = iris)

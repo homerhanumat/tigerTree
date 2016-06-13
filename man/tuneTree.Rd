@@ -21,4 +21,8 @@ No values returned
 \description{
 Hand-Tune a Tree Model
 }
+\note{
+For more details on use, consult
+\url{http://statistics.rainandrhino.org/tigerTree/tuneTree.html}
+}
 

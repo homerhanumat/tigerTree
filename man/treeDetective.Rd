@@ -21,6 +21,10 @@ Side-effects to console.
 Yes-No questions guide the user through a classification or regression
 tree.
 }
+\note{
+For more details on use, consult
+\url{http://statistics.rainandrhino.org/tigerTree/treeDetective.html}
+}
 \examples{
 \dontrun{
 tr.mod <- tree(Species ~ ., data = iris)

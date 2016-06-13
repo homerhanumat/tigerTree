@@ -20,6 +20,10 @@ A table object.
 Easily find the distribtution of the response variable at each of the
 nodes of a classification tree.
 }
+\note{
+For more details on use, consult
+\url{http://statistics.rainandrhino.org/tigerTree/distAtNodes.html}
+}
 \examples{
 \dontrun{
 dfs <- divideTrainTest(seed = 3030, prop.train = 0.67, data = iris)

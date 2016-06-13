@@ -6,6 +6,8 @@
 #' @param truth values of response variable in the quiz data
 #'
 #' @return No values returned
+#' @note For more details on use, consult
+#' \url{http://statistics.rainandrhino.org/tigerTree/tuneTree.html}
 #' @export
 tuneTree <- function(formula, data, testSet, truth) {
 

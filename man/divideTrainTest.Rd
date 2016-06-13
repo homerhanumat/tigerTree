@@ -23,4 +23,8 @@ elements named \code{train} and \code{quiz} and \code{test}.
 \description{
 Divide a data frame into training and test set, or training, quiz and test set.
 }
+\note{
+For more details on use, consult
+\url{http://statistics.rainandrhino.org/tigerTree/divideTrainTest.html}
+}
 

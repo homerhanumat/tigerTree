@@ -10,6 +10,8 @@
 #'
 #' @return A list with elements named \code{test} and \code{train}, or with
 #' elements named \code{train} and \code{quiz} and \code{test}.
+#' @note For more details on use, consult
+#' \url{http://statistics.rainandrhino.org/tigerTree/divideTrainTest.html}
 #' @export
 divideTrainTest <- function(seed = NULL, prop.train = 0.6,
                             prop.quiz = NULL, data) {
@@ -76,6 +78,8 @@ divideTrainTest <- function(seed = NULL, prop.train = 0.6,
 #' tr.mod <- tree(Species ~ ., data = irisTrain)
 #' summary(tr.mod)
 #' tryTree(mod = tr.mod, testSet = irisTest, truth = irisTest$Species)
+#' @note For more details on use, consult
+#' \url{http://statistics.rainandrhino.org/tigerTree/divideTrainTest.html}
 #' @export
 tryTree <- function(mod, testSet, truth, printOut = TRUE) {
   treeType <- class(mod$y)
@@ -133,6 +137,8 @@ tryTree <- function(mod, testSet, truth, printOut = TRUE) {
 #' tr.mod <- tree(Species ~ ., data = iris)
 #' treeDetective(tr.mod, iris)
 #' }
+#' @note For more details on use, consult
+#' \url{http://statistics.rainandrhino.org/tigerTree/treeDetective.html}
 treeDetective <- function(mod, data, rowname = "1") {
   df <- mod$frame
   yprobs <- df$yprob
@@ -221,6 +227,8 @@ numericQuestion <- function(charStr, varName) {
 #' tr.mod <- tree(Species ~ ., data = irisTrain)
 #' distAtNodes(tr.mod, df = irisTest, resp_varname = "Species")
 #' }
+#' @note For more details on use, consult
+#' \url{http://statistics.rainandrhino.org/tigerTree/distAtNodes.html}
 distAtNodes <- function(mod, df, resp_varname) {
   nodes_by_row <- predict(mod, newdata = df, type = "where")
   nodes_by_num <- plyr::mapvalues(nodes_by_row,
