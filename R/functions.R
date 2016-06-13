@@ -215,7 +215,7 @@ numericQuestion <- function(charStr, varName) {
 #'
 #' @param mod A tree model constructed by the \code{tree} package.
 #' @param df A data frame (usually the training set, quiz set or test set).
-#' @param resp_varname Yhe name of the response variable, as a character string.
+#' @param resp_varname The name of the response variable, as a character string.
 #'
 #' @return A table object.
 #' @export
