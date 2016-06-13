@@ -73,7 +73,7 @@ Cross-validation is somewhat beyond the scope of our elementary classes, so when
 
 Our `tree`-package approach makes it fairly easy for students to move on to random forests.  They are also able to use trees for other purposes besides prediction (see the Vignette on `distAtNodes()`).
 
-We hope soon to write up a miniature online textbook on trees and random forests.  The link will appear here when the materials are ready.
+We hope soon to write up a miniature online textbook on trees and random forests.  The link will appear here when the materials are ready.  In the meantime read the Vignettes.
 
 
 
