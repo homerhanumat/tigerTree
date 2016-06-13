@@ -206,6 +206,7 @@ $(document).ready(function ()  {
 }
 }
 
+
 .toc-content {
   padding-left: 30px;
   padding-right: 40px;
@@ -342,7 +343,68 @@ div.tocify {
 </div>
 
 
-<p>TODO</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p><code>tigerTree</code> is designed for courses in statistics and data analysis where the students use R but are not yet prepared to make the leap to treating R as a programming language. Some functions in the package permit students to build and test tree models, and to extract information from these tests, without worrying too much about complex syntax. Other functions are primarily instructional in nature, aiming to illustrate particular concepts about predictive modeling in general or trees in particular.</p>
+<p>We chose to build the <code>tigerTree</code> on top of Brian Ripley’s <code>tree</code> package. Although even Professor Ripley other packages such as <code>rpart</code> for professional use, the <code>tree</code> package creates tree models in a way that is more transparent for beginning students, who can then move on to <code>rpart</code>, <code>party</code>, <code>caret</code> and other packages in later courses or in their working lives.</p>
+</div>
+<div id="sequence" class="section level2">
+<h2>Sequence</h2>
+<div id="first-models" class="section level3">
+<h3>First Models</h3>
+<p>We introduce classification trees with the <code>tree::tree()</code> function, using only the default control-values at first. Thus:</p>
+<pre class="r"><code>library(tigerstats)
+help(m111survey)  # a familiar &quot;stock-example&quot; data frame for our students
+trMod &lt;- tree(sex ~ ., data = m111survey)
+plot(trMod); text(trMod)</code></pre>
+<p><img src="instructorNotes_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>The interactive app <code>treeDetective()</code> helps students connect graphs such as the above with the tree model as a predictive device. It is also useful in showing students how the a tree model deals with missing values.</p>
+<p>The construction of a simple classification tree based on two numerical predictor variables can easily be shown in a series of slides.</p>
+</div>
+<div id="understanding-output" class="section level3">
+<h3>Understanding Output</h3>
+<p>We find it very helpful to spend some time on the concept of deviance, so that students can understand all parts of the text-based view of the model:</p>
+<pre class="r"><code>trMod</code></pre>
+<pre><code>## node), split, n, deviance, yval, (yprob)
+##       * denotes terminal node
+## 
+## 1) root 68 93.320 female ( 0.55882 0.44118 )  
+##   2) ideal_ht &lt; 71 39 15.780 female ( 0.94872 0.05128 )  
+##     4) GPA &lt; 2.785 6  7.638 female ( 0.66667 0.33333 ) *
+##     5) GPA &gt; 2.785 33  0.000 female ( 1.00000 0.00000 ) *
+##   3) ideal_ht &gt; 71 29  8.700 male ( 0.03448 0.96552 )  
+##     6) fastest &lt; 92.5 5  5.004 male ( 0.20000 0.80000 ) *
+##     7) fastest &gt; 92.5 24  0.000 male ( 0.00000 1.00000 ) *</code></pre>
+<p>This also helps students understand the output of:</p>
+<pre class="r"><code>summary(trMod)</code></pre>
+<pre><code>## 
+## Classification tree:
+## tree(formula = sex ~ ., data = m111survey)
+## Variables actually used in tree construction:
+## [1] &quot;ideal_ht&quot; &quot;GPA&quot;      &quot;fastest&quot; 
+## Number of terminal nodes:  4 
+## Residual mean deviance:  0.1975 = 12.64 / 64 
+## Misclassification error rate: 0.04412 = 3 / 68</code></pre>
+</div>
+<div id="tree-control" class="section level3">
+<h3>Tree-Control</h3>
+<p>Next we bring in the idea that one can grow trees of various “sizes.” We introduce the <code>tree::tree.control()</code> function and carefully explain all of its arguments.</p>
+<p>By this point we will have introduced regression trees, too.</p>
+</div>
+<div id="trainquiztest" class="section level3">
+<h3>Train/Quiz/Test</h3>
+<p>When students are accustomed to making trees of various sizes and interpreting them, we move on to the basic ideas of predictive modeling, especially the notion of training vs. test sets. Quiz sets are introduced early, in order to deal with the common case in which one builds a number of models and compares them on a quiz set in order to choose the “best” one. The Shiny app <code>tuneTree()</code> is useful for this purpose. The app permits students construct to new trees “by hand”, adjusting <code>tree.control()</code> parameters as they like, and keeps a record of all the trees they have made. Here students will encounter for the first time the U-shaped graphs of performance vs. size and get the idea that models of “intermediate” size tend to perform best on new data.</p>
+</div>
+<div id="pruning-trees" class="section level3">
+<h3>Pruning Trees</h3>
+<p>Cross-validation is somewhat beyond the scope of our elementary classes, so when it comes to standard procedures for making and assessing many tree models, we prefer <code>tree::prune.tree()</code>. This procedures works backwards from a relatively “large” initial tree, systematically snipping off nodes to produce successively smaller sub-trees whose performance on a quiz set is assessed. Students can use a plot of the results to choose a favorite model for evaluation on the test set, just as they might have used the graph in <code>tunetree()</code> to select a “best” tree.</p>
+</div>
+</div>
+<div id="further-remarks" class="section level2">
+<h2>Further Remarks</h2>
+<p>Our <code>tree</code>-package approach makes it fairly easy for students to move on to random forests. They are also able to use trees for other purposes besides prediction (see the Vignette on <code>distAtNodes()</code>).</p>
+<p>We hope soon to write up a miniature online textbook on trees and random forests. The link will appear here when the materials are ready.</p>
+</div>
 
 
 

@@ -8,6 +8,74 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tigerstats)
+library(tigerTree)
 ```
 
-TODO
+## Introduction
+
+`tigerTree` is designed for courses in statistics and data analysis where the students use R but are not yet prepared to make the leap to treating R as a programming language.  Some functions in the package permit students to build and test tree models, and to extract information from these tests, without worrying too much about complex syntax. Other functions are primarily instructional in nature, aiming to illustrate particular concepts about predictive modeling in general or trees in particular.
+
+We chose to build the `tigerTree` on top of Brian Ripley's `tree` package.  Although even Professor Ripley other packages such as `rpart` for professional use, the `tree` package creates tree models in a way that is more transparent for beginning students, who can then move on to `rpart`, `party`, `caret` and other packages in later courses or in their working lives.
+
+## Sequence
+
+### First Models
+
+We introduce classification trees with the `tree::tree()` function, using only the default control-values at first.  Thus:
+
+```{r eval = FALSE}
+library(tigerstats)
+help(m111survey)  # a familiar "stock-example" data frame for our students
+trMod <- tree(sex ~ ., data = m111survey)
+plot(trMod); text(trMod)
+```
+
+```{r echo = FALSE}
+trMod <- tree(sex ~ ., data = m111survey)
+plot(trMod); text(trMod)
+```
+
+
+The interactive app `treeDetective()` helps students connect graphs such as the above with the tree model as a predictive device.  It is also useful in showing students how the a tree model deals with missing values.
+
+The construction of a simple classification tree based on two numerical predictor variables can easily be shown in a series of slides.
+
+### Understanding Output
+
+We find it very helpful to spend some time on the concept of deviance, so that students can understand all parts of the text-based view of the model:
+
+```{r}
+trMod
+```
+
+This also helps students understand the output of:
+
+```{r}
+summary(trMod)
+```
+
+### Tree-Control
+
+Next we bring in the idea that one can grow trees of various "sizes."  We introduce the `tree::tree.control()` function and carefully explain all of its arguments.
+
+By this point we will have introduced regression trees, too.
+
+### Train/Quiz/Test
+
+When students are accustomed to making trees of various sizes and interpreting them, we move on to the basic ideas of predictive modeling, especially the notion of training vs. test sets.  Quiz sets are introduced early, in order to deal with the common case in which one builds a number of models and compares them on a quiz set in order to choose the "best" one.  The Shiny app `tuneTree()` is useful for this purpose.  The app permits students construct to new trees "by hand", adjusting `tree.control()` parameters as they like, and keeps a record of all the trees they have made.  Here students will encounter for the first time the U-shaped graphs of performance vs. size and get the idea that models of "intermediate" size tend to perform best on new data.
+
+### Pruning Trees
+
+Cross-validation is somewhat beyond the scope of our elementary classes, so when it comes to standard procedures for making and assessing many tree models, we prefer `tree::prune.tree()`.  This procedures works backwards from a relatively "large" initial tree, systematically snipping off nodes to produce successively smaller sub-trees whose performance on a quiz set is assessed.  Students can use a plot of the results to choose a favorite model for evaluation on the test set, just as they might have used the graph in `tunetree()` to select a "best" tree.
+
+## Further Remarks
+
+Our `tree`-package approach makes it fairly easy for students to move on to random forests.  They are also able to use trees for other purposes besides prediction (see the Vignette on `distAtNodes()`).
+
+We hope soon to write up a miniature online textbook on trees and random forests.  The link will appear here when the materials are ready.
+
+
+
+
+
