@@ -410,7 +410,7 @@ verTest &lt;-  myTrainTest$test  #the test set</code></pre>
 <p>Now you are ready to build your model, using the training set.</p>
 <pre class="r"><code>verMod &lt;- tree(pitch_type ~ ., data = verTrain)
 plot(verMod); text(verMod)</code></pre>
-<p><img src="divideTrainTest_files/figure-html/unnamed-chunk-8-1.png" width="528" /></p>
+<p><img src="divideTrainTest_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>Let’s see how well the tree worked on the data used to build it:</p>
 <pre class="r"><code>summary(verMod)</code></pre>
 <pre><code>## 
