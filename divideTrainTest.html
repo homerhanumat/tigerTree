@@ -379,7 +379,7 @@ ver2$season &lt;- NULL
 ver2$gamedate &lt;- NULL</code></pre>
 <p>Let’s say that we plan to build just one tree model. Then it’s appropriate to divide the data into a training and a test set. We can do with is the <code>divideTrainTest()</code> function:</p>
 <pre class="r"><code>myTrainTest &lt;- divideTrainTest(seed = 4040, prop.train = 0.7, data = ver2)</code></pre>
-<p>The <code>sees</code> argument can be any integer; setting the seed guarantees the reproducibility of your work while making the division “look random.” Setting <code>prop.train</code> to 0.7 ensures an approximately 70%-30% split between training and test sets.</p>
+<p>The <code>seed</code> argument can be any integer; setting the seed guarantees the reproducibility of your work while making the division “look random.” Setting <code>prop.train</code> to 0.7 ensures an approximately 70%-30% split between training and test sets.</p>
 <p>The result is list of two desired data frames. For convenience, let’s give them short names:</p>
 <pre class="r"><code>verTrain &lt;- myTrainTest$train  #the training set
 verTest &lt;-  myTrainTest$test  #the test set</code></pre>
@@ -575,6 +575,32 @@ summary(verMod4)</code></pre>
 ##         SL    1   15    0    0  214</code></pre>
 <p>Based on the result, we figure that our chosen model will have about a 3.4% error rate on new but similar observations of Justin Verlander pitches.</p>
 <p><strong>Note: remember to stick with the model you chose! Don’t go back and try another candidate model on your test set!</strong></p>
+</div>
+<div id="technical-notes" class="section level2">
+<h2>Technical Notes</h2>
+<p><code>tryTree()</code> computes deviance and residual mean deviance using the same approach that <code>summary()</code> uses when applied to a tree model. Thus for a classification tree deviance is first computed at each terminal node as:</p>
+<p><span class="math display">\[-2 \sum_{k = 1}^K n_k \ln p_k,\]</span></p>
+<p>where</p>
+<ul>
+<li><span class="math inline">\(K\)</span> is the number of levels of the response variable;</li>
+<li><span class="math inline">\(n_k\)</span> is the number of observation of the <span class="math inline">\(k^{\mathrm{th}}\)</span> level at the node;</li>
+<li><span class="math inline">\(p_k\)</span> is the proportion of all obervations at the node that are of the <span class="math inline">\(k^{\mathrm{th}}\)</span> level;</li>
+<li>the term <span class="math inline">\(n_k \ln p_k\)</span> is taken to be 0 when <span class="math inline">\(p_k\)</span> is 0.</li>
+</ul>
+<p>The deviance proper is the the sum of the deviances at all of the terminal nodes.</p>
+<p>For regression trees the deviance is first computed at each node as:</p>
+<p><span class="math display">\[\sum_{i=1}^N (y_i - \bar{y})^2,\]</span></p>
+<p>where</p>
+<ul>
+<li><span class="math inline">\(N\)</span> is the number of observations at the node;</li>
+<li><span class="math inline">\(y_i\)</span> is the value of the response variable for the <span class="math inline">\(i^{\mathrm{th}}\)</span> observation at the node;</li>
+<li><span class="math inline">\(\bar{y}\)</span> is the mean of the response variable for all observations at the node.</li>
+</ul>
+<p>The deviance proper is again the sum of the deviances at all of the terminal nodes.</p>
+<p>For either type of tree, the mean residual deviance is:</p>
+<p><span class="math display">\[\frac{\mathrm{deviance}}{n - m},\]</span></p>
+<p>where <span class="math inline">\(n\)</span> is the number of observations at terminal nodes and <span class="math inline">\(m\)</span> is the number of terminal nodes.</p>
+<p>Note that deviance calculations only depend on observations at terminal nodes. Observations that fail to reach a terminal node due to missing values are not taken into account. Similarly, for classification trees the misclassification rate is computed using only the observations at terminal nodes.</p>
 </div>
 
 

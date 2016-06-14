@@ -54,7 +54,7 @@ Let's say that we plan to build just one tree model.  Then it's appropriate to d
 myTrainTest <- divideTrainTest(seed = 4040, prop.train = 0.7, data = ver2)
 ```
 
-The `sees` argument can be any integer; setting the seed guarantees the reproducibility of your work while making the division "look random."  Setting `prop.train` to 0.7 ensures an approximately 70%-30% split between training and test sets.
+The `seed` argument can be any integer; setting the seed guarantees the reproducibility of your work while making the division "look random."  Setting `prop.train` to 0.7 ensures an approximately 70%-30% split between training and test sets.
 
 The result is list of two desired data frames.  For convenience, let's give them short names:
 
@@ -195,6 +195,45 @@ tryTree(mod = verMod4, testSet = verTest, truth = verTest$pitch_type)
 Based on the result, we figure that our chosen model will have about a 3.4% error rate on new but similar observations of Justin Verlander pitches.
 
 **Note:  remember to stick with the model you chose!  Don't go back and try another candidate model on your test set!**
+
+## Technical Notes
+
+`tryTree()` computes deviance and residual mean deviance using the same approach that `summary()` uses when applied to a tree model.  Thus for a classification tree deviance is first computed at each terminal node as:
+
+$$-2 \sum_{k = 1}^K n_k \ln p_k,$$
+
+where
+
+* $K$ is the number of levels of the response variable;
+* $n_k$ is the number of observation of the $k^{\mathrm{th}}$ level at the node;
+* $p_k$ is the proportion of all obervations at the node that are of the $k^{\mathrm{th}}$ level;
+* the term $n_k \ln p_k$ is taken to be 0 when $p_k$ is 0.
+
+The deviance proper is the the sum of the deviances at all of the terminal nodes.
+
+For regression trees the deviance is first computed at each node as:
+
+$$\sum_{i=1}^N (y_i - \bar{y})^2,$$
+
+where
+
+* $N$ is the number of observations at the node;
+* $y_i$ is the value of the response variable for the $i^{\mathrm{th}}$ observation at the node;
+* $\bar{y}$ is the mean of the response variable for all observations at the node.
+
+The deviance proper is again the sum of the deviances at all of the terminal nodes.
+
+For either type of tree, the mean residual deviance is:
+
+$$\frac{\mathrm{deviance}}{n - m},$$
+
+where $n$ is the number of observations at terminal nodes and $m$ is the number of terminal nodes.
+
+Note that deviance calculations only depend on observations at terminal nodes.  Observations that fail to reach a terminal node due to missing values are not taken into account.  Similarly, for classification trees the misclassification rate is computed using only the observations at terminal nodes.
+
+
+
+
 
 
 
