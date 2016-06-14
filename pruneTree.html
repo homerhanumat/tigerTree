@@ -345,7 +345,7 @@ div.tocify {
 
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>The Shiny app called by the <code>tuneTree()</code> function allowed you to create a number of different tree models on a training set and to compare their performance on a quiz set. You were then free to choose the tree you liked best, and to try the chosen tree on a test set.</p>
+<p>The Shiny app called by the <code>tuneTree()</code> function allowed you to create a number of different tree models on a training set and to compare their performance on a quiz set. You were then free to choose the tree youliked best, and to try the chosen tree on a test set.</p>
 <p>But it’s time-consuming to poke around, creating trees one-by-one. Now that we understand the basic idea—tree-performance is a function of tree-size, with trees of “intermediate” size tending to do best—it’s time to let the computer create the trees for you.</p>
 <p><code>prune.tree()</code> provides one way to do this.</p>
 </div>
@@ -456,8 +456,8 @@ df</code></pre>
 <h2>Testing Your Tree</h2>
 <p>Now we have chosen a tree, we should try it out on the test set.</p>
 <pre class="r"><code>tryTree(bestTree, testSet = verTest, truth = verTest$pitch_type)</code></pre>
-<pre><code>## Errors:  58.  Quiz/Test Set Size:  3062.
-## Error Rate is 0.0189.
+<pre><code>## Residual mean deviance:  0.1143 = 346.9 / 3036
+## Misclassification error rate:  0.01894 = 58 / 3062
 ## Confusion matrix:
 ##           truth
 ## prediction   CH   CU   FF   FT   SL

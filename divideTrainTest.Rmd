@@ -7,14 +7,14 @@ output:
 ---
 
 ```{r include=FALSE}
-knitr::opts_chunk$set(tidy=FALSE,fig.width=5.5,fig.height=3.5, cache = F)
+knitr::opts_chunk$set(tidy=FALSE,fig.width=5.5,fig.height=3.5, cache = TRUE)
 library(tigerstats)
 library(tigerTree)
 ```
 
 ## The Idea of Training and Test
 
-When you have made a predictive  model it's important to estimate how well it would perform on *new* observations---that is, on observations that are different from the ones that were used to build the model in the first place.  This cannot be done if you use all of the available data to build your model.  Hence it is usually recommended to divide your data into two sets:
+When you have made a predictive model it's important to estimate how well it would perform on *new* observations---that is, on observations that are different from the ones that were used to build the model in the first place.  This cannot be done if you use all of the available data to build your model.  Hence it is usually recommended to divide your data into two sets:
 
 * a training set, and
 * a test set.
@@ -56,13 +56,7 @@ myTrainTest <- divideTrainTest(seed = 4040, prop.train = 0.7, data = ver2)
 
 The `sees` argument can be any integer; setting the seed guarantees the reproducibility of your work while making the division "look random."  Setting `prop.train` to 0.7 ensures an approximately 70%-30% split between training and test sets.
 
-The result is list of two desired data frames:
-
-```{r}
-str(myTrainTest)
-```
-
-For convenience, let's give them shorter names:
+The result is list of two desired data frames.  For convenience, let's give them short names:
 
 ```{r}
 verTrain <- myTrainTest$train  #the training set

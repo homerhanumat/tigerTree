@@ -14,7 +14,7 @@ library(tigerTree)
 
 ## Introduction
 
-The Shiny app called by the `tuneTree()` function allowed you to create a number of different tree models on a training set and to compare their performance on a quiz set.  You were then free to choose the tree you liked best, and to try the chosen tree on a test set.
+The Shiny app called by the `tuneTree()` function allowed you to create a number of different tree models on a training set and to compare their performance on a quiz set.  You were then free to choose the tree youliked best, and to try the chosen tree on a test set.
 
 But it's time-consuming to poke around, creating trees one-by-one.  Now that we understand the basic idea---tree-performance is a function of tree-size, with trees of "intermediate" size tending to do best---it's time to let the computer create the trees for you.
 
