@@ -65,12 +65,10 @@ divideTrainTest <- function(seed = NULL, prop.train = 0.6,
 #' @param truth Correct values of the response variable.
 #' @param printOut If TRUE, provide a printout to the console.
 #'
-#' @return  A list,  If \code{md} is a classification tree, then the list
-#' contains elements \code{error.rate} and \code{confusion} (the confusion matrix).
-#' If \code{md} is a classification tree, then the list
-#' contains elements \code{error.rate} is a regression tree, then the list contains
-#' elements named \code{mse} and \code{rmse} (mean-square error and root mean square
-#' error).
+#' @return  A list containing: \code{deviance} and \code{residMeanDev}
+#' (residual mean deviance).  If \code{mod} is a classification tree, then the list
+#' also contains \code{error.rate}, \code{misclass} (number of misclassifications
+#' at terminal nodes), and \code{confusion} (the confusion matrix).
 #' @examples
 #' dfs <- divideTrainTest(seed = 3030, prop.train = 0.67, data = iris)
 #' irisTrain <- dfs$train
@@ -89,34 +87,124 @@ tryTree <- function(mod, testSet, truth, printOut = TRUE) {
   testSet <- testSet[!missingResponse,]
   truth <- truth[!missingResponse]
   if (treeType == "factor") {
-    prediction <- predict(mod, newdata = testSet, type = "class")
-    wrong <- prediction != truth
-    error.rate <- mean(wrong)
-    numberWrong <- sum(wrong)
-    testSize <- nrow(testSet)
-    tab <- xtabs(~ prediction + truth)
-    if (printOut) {
-      cat(paste0("Errors:  ", numberWrong,".  Quiz/Test Set Size:  ", testSize, ".\n"))
-      if ( numberMissing > 0) {
-        cat(paste0("(",numberMissing," observations were missing the response",
-                    " variable.\nThey were removed from the quiz/test set.)\n"))
-      }
-      cat(paste0("Error Rate is ", round(error.rate,4),".\n"))
+
+      res <- devClass(mod = mod, newdata = testSet, truth = truth)
+      tab <- res$tab
+      numberWrong <- res$wrong
+      tries <- res$tries
+      error.rate = numberWrong/tries
+      if (printOut) {
+        if ( numberMissing > 0) {
+          cat(paste0("(",numberMissing," observations were missing the response",
+                     " variable.\nThey were removed from the quiz/test set.)\n"))
+        }
+      cat(paste0("Residual mean deviance:  ",
+                 round(res$meanDev,1),
+                 " = ",
+                 round(res$totalDev,1),
+                 " / ",
+                 res$divisor, "\n"))
+      cat(paste0("Misclassification error rate:  ", round(error.rate,5),
+                 " = ", numberWrong, " / ", tries, "\n"))
       cat("Confusion matrix:\n")
       print(tab)
-    }
-    results <- list(error.rate = error.rate, confusion = tab)
+      }
+
+    results <- list(error.rate = error.rate,
+                    misclass = numberWrong,
+                    confusion = tab,
+                    deviance = res$totalDev, residMeanDev = res$meanDev)
     return(invisible(results))
   } else {
-    prediction <- predict(mod, newdata = testSet)
-    mse <- mean((prediction - truth)^2)
-    rmse <- sqrt(mse)
-    if (printOut) {
-      cat(paste0("Mean-square-Error = ", round(mse,3)," RMSE = ", round(rmse, 3),"\n"))
+
+    res <- devRegression(mod = mod, newdata = testSet, truth = truth)
+
+    if ( printOut ) {
+      if ( numberMissing > 0) {
+        cat(paste0("(",numberMissing," observations were missing the response",
+                  " variable.\nThey were removed from the quiz/test set.)\n"))
+      }
+      cat(paste0("Residual mean deviance:  ",
+               round(res$meanDev,4),
+               " = ",
+               round(res$totalDev,1),
+               " / ",
+               res$divisor))
     }
-    results <- list(mse = mse, rmse = rmse)
+
+    results <- list(deviance = res$totalDev, residMeanDev = res$meanDev)
     return(invisible(results))
   }
+}
+
+devRegression <- function(mod, newdata, truth) {
+
+  # make frame of prediction, true value and node-number, for all
+  # observations that arrived at a terminal node
+  prediction <- predict(mod, newdata = newdata)
+  predWhere <-  predict(mod, newdata = newdata, type = "where")
+      # use utility functions (see after distAtNodes):
+  predWhere <- plyr::mapvalues(predWhere,
+                                  from = nodeRows(mod),
+                                  to   = nodeNumbers(mod))
+  leafNumbers <- row.names(mod$frame)
+  leaves <- unique(leafNumbers[mod$frame$var == "<leaf>"])
+  atLeaf <- predWhere %in% leaves
+  df <- data.frame(prediction, truth, node = predWhere, atLeaf)
+  df <- df[atLeaf,]
+
+  # compute deviance and mean deviance
+  df$sqDev <- with(df, (prediction - truth)^2 )
+  totalDev <- sum(df$sqDev)
+  divisor <- nrow(df) - length(leaves)
+  meanDev <- totalDev/divisor
+  return(list(totalDev = totalDev, divisor = divisor, meanDev = meanDev))
+}
+
+
+devClass <- function(mod, newdata, truth) {
+
+  # cut data down to observations that arrived at a terminal node
+  preds <- predict(mod, newdata = newdata, type = "class")
+  predWhere <-  predict(mod, newdata = newdata, type = "where")
+  # use utility functions (see after distAtNodes):
+  predWhere <- plyr::mapvalues(predWhere,
+                               from = nodeRows(mod),
+                               to   = nodeNumbers(mod))
+  leafNumbers <- row.names(mod$frame)
+  leaves <- unique(leafNumbers[mod$frame$var == "<leaf>"])
+  atLeaf <- predWhere %in% leaves
+  truth <- truth[atLeaf]
+  nodes <- predWhere[atLeaf]
+  prediction <- preds[atLeaf]
+
+  # get confusion matrix:
+  confusion <- xtabs( ~ prediction + truth)
+
+  # now get the distributions at the terminal nodes:
+  tab <- xtabs(~ nodes + truth)
+
+  # function to compute deviance at node:
+  nodeDev <- function(dist) {
+    if (any(dist == 0) ) return(0)
+    n <- sum(dist)
+    dev <- -2*(sum(dist*log(dist/n)))
+    dev
+  }
+
+  # use function to compute deviance:
+  totalDev <- 0
+  for ( i in 1:nrow(tab) ) {
+    totalDev <- totalDev + nodeDev(tab[i,])
+  }
+  divisor <- length(truth) - length(unique(nodes))
+  meanDev <- totalDev/divisor
+
+  # get the rest and return:
+  wrong <- sum(prediction != truth)
+  return(list(totalDev = totalDev, divisor = divisor, meanDev = meanDev,
+              tries = length(prediction), wrong = wrong,
+              tab = confusion))
 }
 
 

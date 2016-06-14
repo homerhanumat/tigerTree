@@ -57,7 +57,6 @@ tuneTree <- function(formula, data, testSet, truth) {
             HTML("<br>"),
             htmlOutput("performance"),
             tableOutput("confusion")
-            #verbatimTextOutput("try")
           )
           ,
           tabPanel(
@@ -107,7 +106,7 @@ tuneTree <- function(formula, data, testSet, truth) {
       nodes <- summary(mod)$size
       perf <- ifelse(type == "Class",
                      ourTry$error.rate,
-                     ourTry$rmse)
+                     ourTry$deviance)
       df <- data.frame(x = nodes, y = perf)
       rv$currentPoint <- data.frame(x = nodes, y = perf)
       newFrame <- rbind(rv$xy, df)
@@ -119,7 +118,8 @@ tuneTree <- function(formula, data, testSet, truth) {
           minsize = input$minsize,
           mindev = input$mindev,
           nodes = nodes,
-          errRate = perf
+          errRate = perf,
+          deviance = ourTry$deviance
         )
       } else {
         newRecord <- data.frame(
@@ -127,7 +127,7 @@ tuneTree <- function(formula, data, testSet, truth) {
           minsize = input$minsize,
           mindev = input$mindev,
           nodes = nodes,
-          rmse = perf
+          deviance = perf
         )
       }
       rv$record <- rbind(rv$record, newRecord)
@@ -162,11 +162,13 @@ tuneTree <- function(formula, data, testSet, truth) {
     output$performance <- renderUI({
       req(rv$try)
       if (type == "Class") {
-        message <- paste0("<p>On quiz set, error rate is:  ", round(rv$try$error.rate,4),
-                          ".  Confusion matrix is:<p>")
+        message <- paste0("<p>On quiz set, error rate is:  ",
+                          round(rv$try$error.rate,4),
+                          ".  Deviance is:  ",
+                  round(rv$try$deviance,2), ".  Confusion matrix is:<p>")
         HTML(message)
       } else {
-        message <- paste0("<p>On quiz set, root mean square error is:  ", round(rv$try$rmse,3),
+        message <- paste0("<p>On quiz set, deviance is:  ", round(rv$try$deviance,3),
                           ".<p>")
         HTML(message)
       }
@@ -197,19 +199,19 @@ tuneTree <- function(formula, data, testSet, truth) {
       if (type == "Class") {
         ylab <- "error rate on quiz set"
       } else {
-        ylab <- "root mean square error on quiz set"
+        ylab <- "deviance on quiz set"
       }
 
       if (nrow(rv$xy) >= 1) {
         if (!is.null(input$smooth) && input$smooth) {
           p <- ggplot(data = df, mapping = aes(x = x, y = y)) +
             geom_point() + geom_smooth(se = FALSE) +
-            geom_point(data = rv$currentPoint, size = 4, colour = "red")
+            geom_point(data = rv$currentPoint, size = 4, colour = "red") +
           labs(x = "number of terminal nodes", y = ylab)
         } else {
           p <- ggplot(data = df, mapping = aes(x = x, y = y)) +
             geom_point() +
-            geom_point(data = rv$currentPoint, size = 4, colour = "red")
+            geom_point(data = rv$currentPoint, size = 4, colour = "red") +
           labs(x = "number of terminal nodes", y = ylab)
         }
         suppressWarnings(print(p))

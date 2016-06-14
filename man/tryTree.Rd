@@ -16,12 +16,10 @@ tryTree(mod, testSet, truth, printOut = TRUE)
 \item{printOut}{If TRUE, provide a printout to the console.}
 }
 \value{
-A list,  If \code{md} is a classification tree, then the list
-contains elements \code{error.rate} and \code{confusion} (the confusion matrix).
-If \code{md} is a classification tree, then the list
-contains elements \code{error.rate} is a regression tree, then the list contains
-elements named \code{mse} and \code{rmse} (mean-square error and root mean square
-error).
+A list containing: \code{deviance} and \code{residMeanDev}
+(residual mean deviance).  If \code{mod} is a classification tree, then the list
+also contains \code{error.rate}, \code{misclass} (number of misclassifications
+at terminal nodes), and \code{confusion} (the confusion matrix).
 }
 \description{
 Predict with a Tree

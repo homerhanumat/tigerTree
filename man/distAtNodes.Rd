@@ -11,7 +11,7 @@ distAtNodes(mod, df, resp_varname)
 
 \item{df}{A data frame (usually the training set, quiz set or test set).}
 
-\item{resp_varname}{Yhe name of the response variable, as a character string.}
+\item{resp_varname}{The name of the response variable, as a character string.}
 }
 \value{
 A table object.
