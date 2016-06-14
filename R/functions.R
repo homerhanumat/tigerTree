@@ -186,7 +186,7 @@ devClass <- function(mod, newdata, truth) {
 
   # function to compute deviance at node:
   nodeDev <- function(dist) {
-    if (any(dist == 0) ) return(0)
+    dist <- dist[dist > 0]
     n <- sum(dist)
     dev <- -2*(sum(dist*log(dist/n)))
     dev
@@ -196,6 +196,7 @@ devClass <- function(mod, newdata, truth) {
   totalDev <- 0
   for ( i in 1:nrow(tab) ) {
     totalDev <- totalDev + nodeDev(tab[i,])
+    print(nodeDev(tab[i,]))
   }
   divisor <- length(truth) - length(unique(nodes))
   meanDev <- totalDev/divisor
