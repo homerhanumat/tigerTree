@@ -7,14 +7,14 @@ output:
 ---
 
 ```{r include=FALSE}
-knitr::opts_chunk$set(tidy=FALSE,fig.width=5.5,fig.height=3.5, cache = TRUE)
+knitr::opts_chunk$set(tidy=FALSE,fig.width=5.5,fig.height=3.5, cache = F)
 library(tigerstats)
 library(tigerTree)
 ```
 
 ## The Idea of Training and Test
 
-When you have made a predictive model it's important to estimate how well it would perform on *new* observations---that is, on observations that are different from the ones that were used to build the model in the first place.  This cannot be done if you use all of the available data to build your model.  Hence it is usually recommended to divide your data into two sets:
+When you have made a predictive  model it's important to estimate how well it would perform on *new* observations---that is, on observations that are different from the ones that were used to build the model in the first place.  This cannot be done if you use all of the available data to build your model.  Hence it is usually recommended to divide your data into two sets:
 
 * a training set, and
 * a test set.
@@ -139,7 +139,7 @@ summary(verMod1)
 tryTree(mod = verMod1, testSet = verQuiz, truth = verQuiz$pitch_type)
 ```
 
-The first tree we made has only four nodes, and misclassification rate on the quiz data is very high:  about 10.16%.
+The first tree we made has only four nodes, and misclassification rate on the quiz data is very high:  about 10.1%.
 
 Let's make another, very large tree:
 

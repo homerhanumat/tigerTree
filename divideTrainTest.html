@@ -426,8 +426,8 @@ plot(verMod); text(verMod)</code></pre>
 <p>The <code>tryTree()</code> function can be used to see how well the tree performs on the test set:</p>
 <pre class="r"><code>tryTree(mod = verMod, testSet = verTest, 
         truth = verTest$pitch_type)</code></pre>
-<pre><code>## Errors:  156.  Quiz/Test Set Size:  4593.
-## Error Rate is 0.034.
+<pre><code>## Residual mean deviance:  0 = 0 / 4587
+## Misclassification error rate:  0.03396 = 156 / 4593
 ## Confusion matrix:
 ##           truth
 ## prediction   CH   CU   FF   FT   SL
@@ -440,8 +440,8 @@ plot(verMod); text(verMod)</code></pre>
 <p><strong>Note:</strong> It is possible to “try” the tree on the training set:</p>
 <pre class="r"><code>tryTree(mod = verMod, testSet = verTrain, 
         truth = verTrain$pitch_type)</code></pre>
-<pre><code>## Errors:  348.  Quiz/Test Set Size:  10714.
-## Error Rate is 0.0325.
+<pre><code>## Residual mean deviance:  0 = 0 / 10708
+## Misclassification error rate:  0.03248 = 348 / 10714
 ## Confusion matrix:
 ##           truth
 ## prediction   CH   CU   FF   FT   SL
@@ -486,8 +486,8 @@ summary(verMod1)</code></pre>
 ## Residual mean deviance:  0.5243 = 4813 / 9180 
 ## Misclassification error rate: 0.1016 = 933 / 9184</code></pre>
 <pre class="r"><code>tryTree(mod = verMod1, testSet = verQuiz, truth = verQuiz$pitch_type)</code></pre>
-<pre><code>## Errors:  309.  Quiz/Test Set Size:  3061.
-## Error Rate is 0.1009.
+<pre><code>## Residual mean deviance:  0 = 0 / 3057
+## Misclassification error rate:  0.10095 = 309 / 3061
 ## Confusion matrix:
 ##           truth
 ## prediction   CH   CU   FF   FT   SL
@@ -514,8 +514,9 @@ summary(verMod2)</code></pre>
 ## Residual mean deviance:  0 = 0 / 9019 
 ## Misclassification error rate: 0 = 0 / 9184</code></pre>
 <pre class="r"><code>tryTree(mod = verMod2, testSet = verQuiz, truth = verQuiz$pitch_type)</code></pre>
-<pre><code>## Errors:  79.  Quiz/Test Set Size:  3061.
-## Error Rate is 0.0258.
+<pre><code>## The following `from` values were not present in `x`: 13, 15, 20, 21, 27, 31, 34, 36, 43, 48, 52, 67, 71, 72, 84, 104, 108, 117, 123, 134, 137, 139, 147, 155, 156, 166, 173, 185, 189, 194, 198, 199, 213, 214, 218, 239, 245, 246, 253, 254, 266, 269, 277, 282, 283, 293, 298, 299, 300, 303, 315, 316, 318, 323, 324, 329</code></pre>
+<pre><code>## Residual mean deviance:  0 = 0 / 2952
+## Misclassification error rate:  0.02581 = 79 / 3061
 ## Confusion matrix:
 ##           truth
 ## prediction   CH   CU   FF   FT   SL
@@ -544,8 +545,9 @@ summary(verMod3)</code></pre>
 ## Residual mean deviance:  0.07698 = 703.3 / 9136 
 ## Misclassification error rate: 0.0159 = 146 / 9184</code></pre>
 <pre class="r"><code>tryTree(mod = verMod3, testSet = verQuiz, truth = verQuiz$pitch_type)</code></pre>
-<pre><code>## Errors:  68.  Quiz/Test Set Size:  3061.
-## Error Rate is 0.0222.
+<pre><code>## The following `from` values were not present in `x`: 13, 78, 81</code></pre>
+<pre><code>## Residual mean deviance:  0 = 0 / 3016
+## Misclassification error rate:  0.02221 = 68 / 3061
 ## Confusion matrix:
 ##           truth
 ## prediction   CH   CU   FF   FT   SL
@@ -574,8 +576,8 @@ summary(verMod4)</code></pre>
 ## Residual mean deviance:  0.2632 = 2416 / 9178 
 ## Misclassification error rate: 0.0331 = 304 / 9184</code></pre>
 <pre class="r"><code>tryTree(mod = verMod4, testSet = verQuiz, truth = verQuiz$pitch_type)</code></pre>
-<pre><code>## Errors:  101.  Quiz/Test Set Size:  3061.
-## Error Rate is 0.033.
+<pre><code>## Residual mean deviance:  0 = 0 / 3055
+## Misclassification error rate:  0.033 = 101 / 3061
 ## Confusion matrix:
 ##           truth
 ## prediction   CH   CU   FF   FT   SL
@@ -588,8 +590,8 @@ summary(verMod4)</code></pre>
 <p>Which tree should we go with? That’s a judgment call that depends on the practical context of the problem.</p>
 <p>Let’s say that we decide to go with Model 4. Our last act is to test this model on the test set:</p>
 <pre class="r"><code>tryTree(mod = verMod4, testSet = verTest, truth = verTest$pitch_type)</code></pre>
-<pre><code>## Errors:  104.  Quiz/Test Set Size:  3062.
-## Error Rate is 0.034.
+<pre><code>## Residual mean deviance:  0 = 0 / 3056
+## Misclassification error rate:  0.03396 = 104 / 3062
 ## Confusion matrix:
 ##           truth
 ## prediction   CH   CU   FF   FT   SL

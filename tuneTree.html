@@ -379,16 +379,16 @@ verQuiz &lt;- dfs$quiz</code></pre>
 </div>
 <div id="summarytry-tab" class="section level3">
 <h3>Summary/Try Tab</h3>
-<p>In this tab we see the results of “trying out” the most recent model on the quiz set. We are given a summary of the model. If the model is a classification tree then we also get the confusion matrix. If it’s a regression tree then we get a statement of the root mean square error.</p>
+<p>In this tab we see a summary of the most recent tree model, followed by the results of “trying out” the this model on the quiz set. If the model is a classification tree then we also get the confusion matrix. If it’s a regression tree then we only get the deviance on the quiz set.</p>
 </div>
 <div id="performance-vs.size-tab" class="section level3">
 <h3>Performance vs. Size Tab</h3>
-<p>This tab shows a plot of all models created so far. On the horizontal axis is the number of terminal nodes in the model. The vertical axis gives a measure of how well the model performed on the quiz set: either the mis-classification rate if we are working with classification trees or the root mean square error if we are looking at regression trees.</p>
+<p>This tab shows a plot of all models created so far. On the horizontal axis is the number of terminal nodes in the model. The vertical axis gives a measure of how well the model performed on the quiz set: either the mis-classification rate if we are working with classification trees or the deviance if we are looking at regression trees.</p>
 <p>When we have made lots of models the graph should begin to assume a U-shape. (Models of an “intermediate” size tend to excel at handling the bias-variance trade-off.)</p>
 </div>
 <div id="modelscode-tab" class="section level3">
 <h3>Models/Code Tab</h3>
-<p>On the final tab we get a list of all models created so far. We can sort the list by some useful measure, such as number of nodes or mis-classification rate. We can use the mouse to select any number of rows; the code to create the corresponding model(s) will appear near the top of the tab. We can copy and paste this code into any document we like, in order to keep a record the most interesting models.</p>
+<p>On the final tab we get a list of all models created so far. We can sort the list by some useful measure, such as number of nodes or mis-classification rate. We can use the mouse to select any number of rows; the code to create the corresponding model(s) will appear near the top of the tab. We can copy and paste this code into any document we like, in order to keep a record models we like.</p>
 </div>
 </div>
 <div id="afterwards" class="section level2">
