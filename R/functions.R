@@ -99,7 +99,7 @@ tryTree <- function(mod, testSet, truth, printOut = TRUE) {
                      " variable.\nThey were removed from the quiz/test set.)\n"))
         }
       cat(paste0("Residual mean deviance:  ",
-                 round(res$meanDev,1),
+                 round(res$meanDev,4),
                  " = ",
                  round(res$totalDev,1),
                  " / ",
@@ -146,7 +146,8 @@ devRegression <- function(mod, newdata, truth) {
       # use utility functions (see after distAtNodes):
   predWhere <- plyr::mapvalues(predWhere,
                                   from = nodeRows(mod),
-                                  to   = nodeNumbers(mod))
+                                  to   = nodeNumbers(mod),
+                               warn_missing = FALSE)
   leafNumbers <- row.names(mod$frame)
   leaves <- unique(leafNumbers[mod$frame$var == "<leaf>"])
   atLeaf <- predWhere %in% leaves
@@ -170,7 +171,8 @@ devClass <- function(mod, newdata, truth) {
   # use utility functions (see after distAtNodes):
   predWhere <- plyr::mapvalues(predWhere,
                                from = nodeRows(mod),
-                               to   = nodeNumbers(mod))
+                               to   = nodeNumbers(mod),
+                               warn_missing = FALSE)
   leafNumbers <- row.names(mod$frame)
   leaves <- unique(leafNumbers[mod$frame$var == "<leaf>"])
   atLeaf <- predWhere %in% leaves
@@ -321,7 +323,8 @@ distAtNodes <- function(mod, df, resp_varname) {
   nodes_by_row <- predict(mod, newdata = df, type = "where")
   nodes_by_num <- plyr::mapvalues(nodes_by_row,
                                   from = nodeRows(mod),
-                                  to   = nodeNumbers(mod))
+                                  to   = nodeNumbers(mod),
+                                  warn_missing = FALSE)
   tempDF <- data.frame(node = nodes_by_num, response = df[, resp_varname])
   names(tempDF)[2] <- resp_varname
   tab <- eval(parse(
