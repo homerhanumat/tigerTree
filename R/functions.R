@@ -196,7 +196,6 @@ devClass <- function(mod, newdata, truth) {
   totalDev <- 0
   for ( i in 1:nrow(tab) ) {
     totalDev <- totalDev + nodeDev(tab[i,])
-    print(nodeDev(tab[i,]))
   }
   divisor <- length(truth) - length(unique(nodes))
   meanDev <- totalDev/divisor
