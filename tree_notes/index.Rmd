@@ -1,0 +1,26 @@
+--- 
+title: "Predictive Modeling with Trees"
+author: "Homer White"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+knit: "bookdown::render_book"
+output:
+  bookdown::gitbook:
+    lib_dir: "book_assets"
+  bookdown::pdf_book:
+    keep_tex: yes
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+github-repo: homerhanumat/tigerTree
+description: "These are course notes for a unit on trees and random forests."
+---
+
+# Introduction
+
+```{r  include=FALSE}
+library(knitr)
+opts_chunk$set(tidy=FALSE)
+```
+

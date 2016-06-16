@@ -21,6 +21,8 @@ left:
         href: tuneTree.html
       - text: "Tuning Your Tree:  Automated"
         href: pruneTree.html
+  - text: "Notes"
+    href:  tree_notes/_book/index.html
   - text: "Related"
     href:  resources.html
 right:

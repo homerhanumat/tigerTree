@@ -1,0 +1,7 @@
+# Growing and Testing Trees for Predictive Modeling
+
+```{r  include=FALSE}
+require(knitr)
+opts_chunk$set(tidy=FALSE)
+```
+
