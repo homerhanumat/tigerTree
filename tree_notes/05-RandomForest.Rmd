@@ -5,3 +5,6 @@ require(knitr)
 opts_chunk$set(tidy=FALSE)
 ```
 
+```{block, mytext, type = "rmdwarning"}
+Consider yourself warned.
+```
