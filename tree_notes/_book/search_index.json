@@ -1,7 +1,9 @@
 [
-["index.html", "Predictive Modeling with Trees Chapter 1 Introduction", " Predictive Modeling with Trees Homer White 2016-06-16 Chapter 1 Introduction "],
+["index.html", "Predictive Modeling with Trees Chapter 1 Introduction", " Predictive Modeling with Trees Homer White 2016-06-16 Chapter 1 Introduction Let’s see what we can do. Let’s cite (An Introduction to Statistical Learning with Applications in R 2009). References "],
+["graphs.html", "1.1 Graphs", " 1.1 Graphs Can we really make a graph with captions, and refer to it? Figure 1.1: Default classification tree to predict sex on the basis of other variables in the m111survey data frame. As Figure 1.1 shows … "],
+["tables.html", "1.2 Tables", " 1.2 Tables Hmm, let’s make a table.1 Table 1.1: Confusion matrix for the tree model. female male female 37 2 male 1 28 As Table 1.1 shows … We can learn about trees in Chapter 5. --> Tables are fun.↩ "],
 ["classification-trees.html", "Chapter 2 Classification Trees", " Chapter 2 Classification Trees "],
 ["regression-trees.html", "Chapter 3 Regression Trees", " Chapter 3 Regression Trees "],
 ["growing-and-testing-trees-for-predictive-modeling.html", "Chapter 4 Growing and Testing Trees for Predictive Modeling", " Chapter 4 Growing and Testing Trees for Predictive Modeling "],
-["random-forests-an-introduction.html", "Chapter 5 Random Forests: an Introduction", " Chapter 5 Random Forests: an Introduction Consider yourself warned. "]
+["randomforests.html", "Chapter 5 Random Forests: an Introduction", " Chapter 5 Random Forests: an Introduction Consider yourself warned. "]
 ]

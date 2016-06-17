@@ -1,4 +1,4 @@
-# Random Forests:  an Introduction
+# Random Forests:  an Introduction {#randomforests}
 
 ```{r  include=FALSE}
 require(knitr)
