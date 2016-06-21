@@ -25,7 +25,7 @@ The menu items in the Navbar above describe some of the main features of the pac
 
 ```
 install.packages("devtools")
-devtools::install_github("homerhanumat/tigertree")
+devtools::install_github("homerhanumat/tigerTree")
 ```
 
 </div>
