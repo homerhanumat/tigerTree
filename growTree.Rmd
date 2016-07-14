@@ -192,7 +192,7 @@ As a rule, the lower you set `mincut`, `minsize` and `mindev`, the more nodes yo
 
 ### The Default Tree
 
-The default values of `mincut`, minsize` and `mindev` are 5, 10  and 0.01 respectively.  Thus the tree obtained without recourse to `tree.control()`:
+The default values of `mincut`, `minsize` and `mindev` are 5, 10  and 0.01 respectively.  Thus the tree obtained without recourse to `tree.control()`:
 
 ```{r eval = F}
 trSex <- tree(sex ~ ., data = m111survey)
