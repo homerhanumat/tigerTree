@@ -1,7 +1,0 @@
-# Classification Trees
-
-```{r  include=FALSE}
-require(knitr)
-opts_chunk$set(tidy=FALSE)
-```
-

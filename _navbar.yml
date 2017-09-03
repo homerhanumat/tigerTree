@@ -22,7 +22,7 @@ left:
       - text: "Tuning Your Tree:  Automated"
         href: pruneTree.html
   - text: "Notes"
-    href:  tree_notes/_book/index.html
+    href:  https://homerhanumat.github.io/tree-notes
   - text: "Related"
     href:  resources.html
 right:

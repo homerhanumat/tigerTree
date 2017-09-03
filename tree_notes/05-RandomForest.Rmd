@@ -1,6 +1,0 @@
-# Random Forests:  an Introduction {#randomforests}
-
-```{r  include=FALSE}
-require(knitr)
-opts_chunk$set(tidy=FALSE)
-```
