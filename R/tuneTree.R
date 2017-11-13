@@ -162,7 +162,10 @@ tuneTree <- function(formula, data, testSet, truth) {
     output$performance <- renderUI({
       req(rv$try)
       if (type == "Class") {
+        total <- sum(rv$try$confusion)
         message <- paste0("<p>On quiz set, error rate is:  ",
+                          rv$try$misclass, "/",
+                          total, " = ",
                           round(rv$try$error.rate,4),
                           ".  Deviance is:  ",
                   round(rv$try$deviance,2), ".  Confusion matrix is:<p>")
@@ -176,8 +179,12 @@ tuneTree <- function(formula, data, testSet, truth) {
 
     output$confusion <- renderTable({
       req(!is.null(rv$try) && type == "Class")
-      rv$try$confusion
-    })
+      tab <- rv$try$confusion
+      mat <- matrix(as.vector(tab), nrow = nrow(tab))
+      rownames(mat) <- rownames(tab)
+      colnames(mat) <- colnames(tab)
+      mat
+    }, rownames = TRUE)
 
     output$smooth <- renderUI({
       req(rv$xy)
