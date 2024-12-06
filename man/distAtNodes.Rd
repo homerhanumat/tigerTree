@@ -33,4 +33,3 @@ tr.mod <- tree(Species ~ ., data = irisTrain)
 distAtNodes(tr.mod, df = irisTest, resp_varname = "Species")
 }
 }
-

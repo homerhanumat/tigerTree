@@ -27,4 +27,3 @@ Divide a data frame into training and test set, or training, quiz and test set.
 For more details on use, consult
 \url{http://statistics.rainandrhino.org/tigerTree/divideTrainTest.html}
 }
-

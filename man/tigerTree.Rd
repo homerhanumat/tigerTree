@@ -8,4 +8,3 @@
 \description{
 For use by elementary students in statistics and data analysis.
 }
-

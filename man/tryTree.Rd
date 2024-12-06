@@ -36,4 +36,3 @@ tr.mod <- tree(Species ~ ., data = irisTrain)
 summary(tr.mod)
 tryTree(mod = tr.mod, testSet = irisTest, truth = irisTest$Species)
 }
-

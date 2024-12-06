@@ -31,4 +31,3 @@ tr.mod <- tree(Species ~ ., data = iris)
 treeDetective(tr.mod, iris)
 }
 }
-

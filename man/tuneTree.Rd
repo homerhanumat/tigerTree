@@ -25,4 +25,3 @@ Hand-Tune a Tree Model
 For more details on use, consult
 \url{http://statistics.rainandrhino.org/tigerTree/tuneTree.html}
 }
-

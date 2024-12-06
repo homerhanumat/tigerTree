@@ -4,6 +4,7 @@
 #'
 #' @name tigerTree
 #' @docType package
+#' @aliases tigerTree tigerTree-package
 #' @import tree DT ggplot2
 #' @importFrom shiny shinyUI fluidPage sidebarLayout sidebarPanel numericInput
 #' @importFrom shiny titlePanel actionButton mainPanel tabsetPanel tabPanel
